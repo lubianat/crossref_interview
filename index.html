@@ -36,7 +36,7 @@
 
 <body>
     <h1>DOI Affiliation ROR Checker</h1>
-    <p>Enter a DOI (e.g., <code>10.14232/iskkult.2023.8.19</code> or the full DOI URL):</p>
+    <p>Enter a DOI (e.g., <code>10.14232/mped.2024.2.111</code> or the full DOI URL):</p>
     <input type="text" id="doiInput" style="width:400px;">
     <button id="submitBtn">Submit</button>
     <button id="randomBtn">Random</button>
@@ -45,21 +45,33 @@
         <input type="checkbox" id="verbose"> Verbose logging
     </label>
 
+    <h2>Interesting examples</h2>
+    <ul>
+        <li><a href="?doi=10.14232/actahisp.2023.28.151-161">10.14232/actahisp.2023.28.151-161</a></li>
+        <li><a href="?doi=10.14232/jengeo-2024-45530">10.14232/jengeo-2024-45530</a></li>
+        <li><a href="?doi=10.14232/iskkult.2023.8.19">10.14232/iskkult.2023.8.19</a></li>
+        <li><a href="?doi=10.14232/ejqtde.2024.1.73">10.14232/ejqtde.2024.1.73</a></li>
+        <li><a href="?doi=10.14232/iskkult.2024.10.67">10.14232/iskkult.2024.10.67</a></li>
+        <li><a href="?doi=10.14232/kapocs.2022.2.85-95">10.14232/kapocs.2022.2.85-95</a></li>
+        <li><a href="?doi=10.14232/sua.2024.57.4">10.14232/sua.2024.57.4</a></li>
+        <li><a href="?doi=10.14232/mped.2024.2.111">10.14232/mped.2024.2.111</a></li>
+        <li><a href="?doi=10.14232/jengeo-2024-45530">10.14232/jengeo-2024-45530</a></li>
+    </ul>
+
     <div id="debug"></div>
 
     <table id="resultTable" class="display" style="width:100%">
         <thead>
             <tr>
-                <th>Affiliation (DOI)</th>
-                <th>ROR ID (DOI)</th>
-                <th>Names match exactly?</th>
-                <th>Direct ROR Labels (JSON)</th>
-                <th>Search-based top match (Name)</th>
-                <th>Search-based ROR ID</th>
-                <th>Search-based Labels (JSON)</th>
-                <th>Do the RORs match?</th>
-                <th>Direct ROR API Link</th>
-                <th>Search API Link</th>
+                <th>provided name</th>
+                <th>provided ror</th>
+                <th>provided ror name</th>
+                <th>provided ror labels</th>
+                <th>name in ror?</th>
+                <th>search-retrieved ror</th>
+                <th>retrieved ror name</th>
+                <th>search-retrieved ror labels</th>
+                <th>retrieved ror matches provided ror?</th>
             </tr>
         </thead>
         <tbody></tbody>
@@ -67,7 +79,36 @@
 
     <script>
         $(document).ready(function () {
-            var table = $('#resultTable').DataTable();
+            // Initialize DataTable with cell coloring for Yes/No columns:
+            // "name in ror?" is now column index 4 and "retrieved ror matches provided ror?" is index 8.
+            var table = $('#resultTable').DataTable({
+                columnDefs: [{
+                    targets: 4,
+                    createdCell: function (td, cellData) {
+                        if (typeof cellData === "string") {
+                            if (cellData.toLowerCase() === "yes") {
+                                $(td).css("background-color", "lightgreen");
+                            } else if (cellData.toLowerCase() === "no") {
+                                $(td).css("background-color", "salmon");
+                            }
+                        }
+                    }
+                },
+                {
+                    targets: 8,
+                    createdCell: function (td, cellData) {
+                        if (typeof cellData === "string") {
+                            if (cellData.toLowerCase() === "yes") {
+                                $(td).css("background-color", "lightgreen");
+                            } else if (cellData.toLowerCase() === "no") {
+                                $(td).css("background-color", "salmon");
+                            }
+                        }
+                    }
+                }
+                ]
+            });
+
             // Global caches for random queries
             var randomGeneralCache = null;
             var randomPrefixCache = null;
@@ -148,11 +189,19 @@
                     uniqueTuples.forEach(tuple => {
                         logMessage("Processing affiliation: " + tuple.affiliationName, true);
 
-                        var directRORPromise = Promise.resolve(null);
+                        // Build provided ROR clickable link (if provided)
+                        var providedRORLink = "";
+                        var providedRORIdentifier = "";
                         var directURL = "";
                         if (tuple.rorID) {
-                            var rorIdentifier = tuple.rorID.replace(/^https?:\/\/(www\.)?ror\.org\//, "");
-                            directURL = "https://api.ror.org/v1/organizations/" + rorIdentifier;
+                            providedRORIdentifier = tuple.rorID.replace(/^https?:\/\/(www\.)?ror\.org\//, "");
+                            directURL = "https://api.ror.org/v1/organizations/" + providedRORIdentifier;
+                            providedRORLink = '<a href="' + directURL + '" target="_blank">' + tuple.rorID + '</a>';
+                        }
+
+                        // Promise for direct ROR lookup if provided ROR exists.
+                        var directRORPromise = Promise.resolve(null);
+                        if (tuple.rorID) {
                             logMessage('Direct ROR API URL: <a href="' + directURL + '" target="_blank">View JSON</a>', true);
                             directRORPromise = fetchJSON(directURL).catch(err => {
                                 logMessage("Error fetching direct ROR data for " + tuple.affiliationName + ": " + err, false);
@@ -162,6 +211,7 @@
                             logMessage("No ROR ID provided for affiliation: " + tuple.affiliationName, true);
                         }
 
+                        // Lookup via search
                         var affiliationSearchStr = tuple.affiliationName;
                         var searchURL = "https://api.ror.org/v1/organizations?affiliation=" + encodeURIComponent(affiliationSearchStr);
                         logMessage('Search ROR API URL: <a href="' + searchURL + '" target="_blank">View JSON</a>', true);
@@ -174,6 +224,13 @@
                             var directROR = results[0];
                             var searchData = results[1];
 
+                            // Provided ROR Name clickable link (from direct lookup)
+                            var providedRORNameLink = "";
+                            if (directROR && directROR.name) {
+                                providedRORNameLink = directROR.name;
+                            }
+
+                            // Build the list of names (from direct lookup) to compare the provided affiliation name.
                             var directNamesList = [];
                             if (directROR && directROR.name) {
                                 directNamesList.push(directROR.name);
@@ -201,18 +258,26 @@
                             };
                             var directLabelsJSON = JSON.stringify(directLabelsObj);
 
-                            if (!directROR && tuple.rorID) {
-                                logMessage("Direct ROR lookup returned no data for affiliation: " + tuple.affiliationName, false);
-                            }
-
-                            var searchTopName = "";
-                            var searchTopRORID = "";
+                            // Process search-based result.
+                            var searchTopROR = "";
+                            var retrievedRORNameLink = "";
                             var searchLabelsJSON = "";
+                            var originalSearchTopRORID = "";
                             if (searchData && Array.isArray(searchData.items) && searchData.items.length > 0) {
                                 var topItem = searchData.items[0];
                                 if (topItem.organization) {
-                                    searchTopName = topItem.organization.name || "";
-                                    searchTopRORID = topItem.organization.id || "";
+                                    originalSearchTopRORID = topItem.organization.id || "";
+                                    var searchRORIdentifier = "";
+                                    var searchURLClickable = "";
+                                    if (originalSearchTopRORID) {
+                                        searchRORIdentifier = originalSearchTopRORID.replace(/^https?:\/\/(www\.)?ror\.org\//, "");
+                                        searchURLClickable = "https://api.ror.org/v1/organizations/" + searchRORIdentifier;
+                                        searchTopROR = '<a href="' + searchURLClickable + '" target="_blank">' + originalSearchTopRORID + '</a>';
+                                    }
+                                    var searchRetrievedName = topItem.organization.name || "";
+                                    if (searchRetrievedName) {
+                                        retrievedRORNameLink = searchRetrievedName;
+                                    }
                                     var searchLabelsObj = {
                                         acronyms: topItem.organization.acronyms ? topItem.organization.acronyms : [],
                                         aliases: topItem.organization.aliases ? topItem.organization.aliases : [],
@@ -225,22 +290,29 @@
                                 logMessage("No search result found for affiliation: " + affiliationSearchStr, false);
                             }
 
-                            var rorIDsMatch = (tuple.rorID && searchTopRORID && tuple.rorID === searchTopRORID) ? "Yes" : "No";
+                            // Compare provided ROR with the search result.
+                            var rorIDsMatch = (tuple.rorID && originalSearchTopRORID && (tuple.rorID === originalSearchTopRORID)) ? "Yes" : "No";
 
-                            var directAPILinkHTML = tuple.rorID ? '<a href="' + directURL + '" target="_blank">JSON</a>' : "";
-                            var searchAPILinkHTML = '<a href="' + searchURL + '" target="_blank">JSON</a>';
-
+                            // Add row with all 9 columns:
+                            // 1: provided name
+                            // 2: provided ror (clickable)
+                            // 3: provided ror name (clickable)
+                            // 4: provided ror labels
+                            // 5: name in ror? (Yes/No)
+                            // 6: search-retrieved ror (clickable)
+                            // 7: retrieved ror name (clickable)
+                            // 8: search-retrieved ror labels
+                            // 9: retrieved ror matches provided ror? (Yes/No)
                             table.row.add([
                                 tuple.affiliationName,
-                                tuple.rorID,
-                                namesMatch,
+                                providedRORLink,
+                                providedRORNameLink,
                                 directLabelsJSON,
-                                searchTopName,
-                                searchTopRORID,
+                                namesMatch,
+                                searchTopROR,
+                                retrievedRORNameLink,
                                 searchLabelsJSON,
-                                rorIDsMatch,
-                                directAPILinkHTML,
-                                searchAPILinkHTML
+                                rorIDsMatch
                             ]).draw(false);
                         });
                     });
@@ -249,12 +321,13 @@
                 });
             }
 
-            // "Submit" button: clear debug log and table, then run matcher.
+            // "Submit" button: update URL, clear debug log and table, then run matcher.
             $('#submitBtn').on('click', function () {
                 $("#debug").empty();
                 table.clear().draw();
                 var doiRaw = $('#doiInput').val();
                 var doi = extractDOI(doiRaw);
+                window.history.pushState(null, '', '?doi=' + encodeURIComponent(doi));
                 runMatcher(doi, false);
             });
 
@@ -271,15 +344,17 @@
                     var randomDOI = items[randomIndex].DOI;
                     logMessage("Random DOI found (cached): " + randomDOI, false);
                     $("#doiInput").val(randomDOI);
+                    window.history.pushState(null, '', '?doi=' + encodeURIComponent(randomDOI));
                     runMatcher(randomDOI, false);
                 } else {
                     fetchJSON(randomQueryURL).then(function (data) {
-                        randomGeneralCache = data; // Cache the result
+                        randomGeneralCache = data;
                         if (data.message.items && data.message.items.length > 0) {
                             var randomIndex = Math.floor(Math.random() * data.message.items.length);
                             var randomDOI = data.message.items[randomIndex].DOI;
                             logMessage("Random DOI found: " + randomDOI, false);
                             $("#doiInput").val(randomDOI);
+                            window.history.pushState(null, '', '?doi=' + encodeURIComponent(randomDOI));
                             runMatcher(randomDOI, false);
                         } else {
                             logMessage("No works with affiliation found in the random query.", false);
@@ -290,7 +365,7 @@
                 }
             });
 
-            // "Random 10.14232" button: clear debug log and table, then fetch random DOI (with caching) for publisher 10.14232 and run matcher.
+            // "Random 10.14232" button: clear debug log and table, then fetch random DOI for publisher 10.14232.
             $('#randomPrefixBtn').on('click', function () {
                 $("#debug").empty();
                 table.clear().draw();
@@ -303,15 +378,17 @@
                     var randomDOI = items[randomIndex].DOI;
                     logMessage("Random DOI from 10.14232 found (cached): " + randomDOI, false);
                     $("#doiInput").val(randomDOI);
+                    window.history.pushState(null, '', '?doi=' + encodeURIComponent(randomDOI));
                     runMatcher(randomDOI, false);
                 } else {
                     fetchJSON(prefixQueryURL).then(function (data) {
-                        randomPrefixCache = data; // Cache the result
+                        randomPrefixCache = data;
                         if (data.message.items && data.message.items.length > 0) {
                             var randomIndex = Math.floor(Math.random() * data.message.items.length);
                             var randomDOI = data.message.items[randomIndex].DOI;
                             logMessage("Random DOI from 10.14232 found: " + randomDOI, false);
                             $("#doiInput").val(randomDOI);
+                            window.history.pushState(null, '', '?doi=' + encodeURIComponent(randomDOI));
                             runMatcher(randomDOI, false);
                         } else {
                             logMessage("No works from publisher 10.14232 with affiliation found in the query.", false);
@@ -322,6 +399,13 @@
                 }
             });
 
+            // On page load, check URL for a DOI query parameter.
+            var urlParams = new URLSearchParams(window.location.search);
+            var doiParam = urlParams.get('doi');
+            if (doiParam) {
+                $("#doiInput").val(doiParam);
+                runMatcher(doiParam, false);
+            }
         });
     </script>
 </body>
