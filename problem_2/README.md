@@ -99,3 +99,12 @@ Maybe members in non-English speaking countries, or authors from non-English spe
 
 
 
+## Good examples found: 
+
+10.14232/actahisp.2023.28.9-26
+10.14232/ejqtde.2024.1.73
+10.14232/iskkult.2024.10.67
+10.14232/kapocs.2022.2.85-95
+10.14232/sua.2024.57.4
+10.14232/mped.2024.2.111 --> most interesting case
+10.14232/jengeo-2024-45530
