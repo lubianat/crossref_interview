@@ -8,12 +8,14 @@ from typing import Optional, List, Dict, Tuple
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from tqdm import tqdm
 
+
 def setup_logging():
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s [%(levelname)s] %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S"
+        datefmt="%Y-%m-%d %H:%M:%S",
     )
+
 
 def extract_records_from_file(file_path: str) -> Optional[List[Dict]]:
     try:
@@ -34,6 +36,7 @@ def extract_records_from_file(file_path: str) -> Optional[List[Dict]]:
     except Exception as e:
         logging.error(f"Error reading file {file_path}: {e}")
     return None
+
 
 def process_record(record: Dict) -> List[List[str]]:
     rows = []
@@ -64,6 +67,7 @@ def process_record(record: Dict) -> List[List[str]]:
                     rows.append([doi, affiliation_name, ror_id])
     return rows
 
+
 def process_single_file(file_path: str) -> Tuple[str, List[Tuple[str, str, str]]]:
     """
     Process a single file and return its filename along with the list of extracted rows.
@@ -79,7 +83,10 @@ def process_single_file(file_path: str) -> Tuple[str, List[Tuple[str, str, str]]
             rows.append(tuple(row))
     return (os.path.basename(file_path), rows)
 
-def process_data_directory_parallel(data_dir: str, writer: csv.writer, csvfile, processed_files_log: str):
+
+def process_data_directory_parallel(
+    data_dir: str, writer: csv.writer, csvfile, processed_files_log: str
+):
     # Load the list of processed files
     processed_files = set()
     if os.path.exists(processed_files_log):
@@ -93,7 +100,7 @@ def process_data_directory_parallel(data_dir: str, writer: csv.writer, csvfile, 
         for filename in os.listdir(data_dir)
         if filename.endswith(".json.gz") and filename not in processed_files
     ]
-    
+
     seen_rows = set()  # for deduplication
 
     with ProcessPoolExecutor(max_workers=10) as executor:
@@ -102,14 +109,20 @@ def process_data_directory_parallel(data_dir: str, writer: csv.writer, csvfile, 
             executor.submit(process_single_file, file_path): file_path
             for file_path in file_list
         }
-        
+
         # Use tqdm to monitor progress
-        for future in tqdm(as_completed(future_to_file), total=len(future_to_file), desc="Processing files"):
+        for future in tqdm(
+            as_completed(future_to_file),
+            total=len(future_to_file),
+            desc="Processing files",
+        ):
             file_path = future_to_file[future]
             try:
                 filename, file_rows = future.result()
             except Exception as exc:
-                logging.error(f"File {os.path.basename(file_path)} generated an exception: {exc}")
+                logging.error(
+                    f"File {os.path.basename(file_path)} generated an exception: {exc}"
+                )
                 continue
 
             # Write unique rows to the CSV file
@@ -123,18 +136,23 @@ def process_data_directory_parallel(data_dir: str, writer: csv.writer, csvfile, 
             # Log file as processed
             with open(processed_files_log, "a", encoding="utf-8") as pf:
                 pf.write(filename + "\n")
-            
+
             # Flush CSV output immediately
             csvfile.flush()
             os.fsync(csvfile.fileno())
-            
-            logging.info(f"Processed {filename}: {len(file_rows)} rows, {new_rows} new unique rows.")
-            
+
+            logging.info(
+                f"Processed {filename}: {len(file_rows)} rows, {new_rows} new unique rows."
+            )
+
+
 def main():
     setup_logging()
     logging.info("Starting Crossref ROR extraction process with parallel processing.")
 
-    data_dir = "/home/lubianat/Documents/random/crossref_data_exploration/problem_2/data"
+    data_dir = (
+        "/home/lubianat/Documents/random/crossref_data_exploration/problem_2/data"
+    )
     output_csv = "crossref_affiliation_ids.csv"
     processed_files_log = "processed_files.txt"
 
@@ -147,12 +165,15 @@ def main():
         with open(output_csv, mode="w", newline="", encoding="utf-8") as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(["DOI", "Affiliation_Name", "ROR_ID"])
-            process_data_directory_parallel(data_dir, writer, csvfile, processed_files_log)
+            process_data_directory_parallel(
+                data_dir, writer, csvfile, processed_files_log
+            )
     except Exception as e:
         logging.error(f"Error writing output CSV: {e}")
         return
 
     logging.info(f"Processing complete. Extracted data saved to {output_csv}")
+
 
 if __name__ == "__main__":
     main()

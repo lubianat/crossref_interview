@@ -1,3 +1,5 @@
 problem_1/
 .venv/
 problem_2/data/*
+problem_2/src/data/*cache_directory/
+problem_2/src/data/

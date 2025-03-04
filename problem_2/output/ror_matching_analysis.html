@@ -1,0 +1,2512 @@
+
+    <h2>Decision Tree for ROR Matching</h2>
+    <p>Matching is done in the following order:</p>
+    <ol>
+        <li>Exact match with ROR display name</li>
+        <li>Exact match with ROR label</li>
+        <li>Exact match with ROR alias</li>
+        <li>Exact match with ROR acronym</li>
+        <li>Comma-separated subpart match with ROR label</li>
+        <li>Comma-separated subpart match with ROR alias</li>
+        <li>Comma-separated subpart match with ROR acronym</li>
+        <li>Space-separated supart match with ROR label </li>
+        <li>Space-separated supart match with ROR alias </li>
+        <li>Space-separated supart match with ROR acronym </li>
+        <li>Exact match with Wikidata label</li>
+        <li>Comma-separated subpart match with Wikidata label</li>
+    </ol>
+    
+<h2>Match Summary</h2>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>match_type</th>
+      <th>count</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ror_display</td>
+      <td>48107</td>
+    </tr>
+    <tr>
+      <td>comma-separated subpart label match</td>
+      <td>20991</td>
+    </tr>
+    <tr>
+      <td>ror_display as substring</td>
+      <td>4818</td>
+    </tr>
+    <tr>
+      <td>comma-separated subpart wikidata match</td>
+      <td>4237</td>
+    </tr>
+    <tr>
+      <td>no match</td>
+      <td>3179</td>
+    </tr>
+    <tr>
+      <td>wikidata</td>
+      <td>1981</td>
+    </tr>
+    <tr>
+      <td>label</td>
+      <td>1644</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 1 (COMMON TERMS)</td>
+      <td>1138</td>
+    </tr>
+    <tr>
+      <td>inner parenthesis acronym match</td>
+      <td>634</td>
+    </tr>
+    <tr>
+      <td>space-separated subpart acronym match</td>
+      <td>631</td>
+    </tr>
+    <tr>
+      <td>comma-separated subpart alias match</td>
+      <td>504</td>
+    </tr>
+    <tr>
+      <td>comma-separated subpart acronym match</td>
+      <td>325</td>
+    </tr>
+    <tr>
+      <td>alias</td>
+      <td>277</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 2 (COMMON TERMS)</td>
+      <td>266</td>
+    </tr>
+    <tr>
+      <td>name as substring of ror_display</td>
+      <td>227</td>
+    </tr>
+    <tr>
+      <td>acronym</td>
+      <td>189</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 1 (PHRASE)</td>
+      <td>184</td>
+    </tr>
+    <tr>
+      <td>alias as substring</td>
+      <td>151</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 3 (COMMON TERMS)</td>
+      <td>142</td>
+    </tr>
+    <tr>
+      <td>before parenthesis label match</td>
+      <td>125</td>
+    </tr>
+    <tr>
+      <td>space-separated subpart alias match</td>
+      <td>123</td>
+    </tr>
+    <tr>
+      <td>label as substring</td>
+      <td>119</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 4 (COMMON TERMS)</td>
+      <td>84</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 1 (EXACT)</td>
+      <td>72</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 2 (PHRASE)</td>
+      <td>69</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 3 (PHRASE)</td>
+      <td>58</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 9 (COMMON TERMS)</td>
+      <td>58</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 5 (COMMON TERMS)</td>
+      <td>52</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 1 (FUZZY)</td>
+      <td>50</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 4 (PHRASE)</td>
+      <td>35</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 6 (COMMON TERMS)</td>
+      <td>34</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 2 (FUZZY)</td>
+      <td>31</td>
+    </tr>
+    <tr>
+      <td>inner parenthesis alias match</td>
+      <td>30</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 7 (COMMON TERMS)</td>
+      <td>30</td>
+    </tr>
+    <tr>
+      <td>space-separated subpart label match</td>
+      <td>30</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 8 (COMMON TERMS)</td>
+      <td>28</td>
+    </tr>
+    <tr>
+      <td>name as substring of alias</td>
+      <td>25</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 11 (COMMON TERMS)</td>
+      <td>23</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 10 (COMMON TERMS)</td>
+      <td>23</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 5 (PHRASE)</td>
+      <td>22</td>
+    </tr>
+    <tr>
+      <td>inner parenthesis label match</td>
+      <td>21</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 12 (COMMON TERMS)</td>
+      <td>17</td>
+    </tr>
+    <tr>
+      <td>name as substring of label</td>
+      <td>15</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 13 (COMMON TERMS)</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 3 (FUZZY)</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 16 (COMMON TERMS)</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 17 (COMMON TERMS)</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 7 (PHRASE)</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 5 (FUZZY)</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 14 (COMMON TERMS)</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 4 (FUZZY)</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 20 (COMMON TERMS)</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 18 (COMMON TERMS)</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <td>before parenthesis alias match</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 9 (PHRASE)</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 15 (COMMON TERMS)</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 16 (PHRASE)</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 12 (PHRASE)</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 25 (COMMON TERMS)</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 22 (COMMON TERMS)</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 26 (COMMON TERMS)</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 10 (PHRASE)</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 21 (COMMON TERMS)</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 6 (PHRASE)</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 11 (PHRASE)</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 6 (FUZZY)</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 31 (COMMON TERMS)</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 13 (PHRASE)</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 43 (COMMON TERMS)</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 11 (FUZZY)</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 28 (PHRASE)</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 7 (FUZZY)</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 15 (FUZZY)</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 29 (COMMON TERMS)</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 18 (PHRASE)</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 15 (PHRASE)</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 17 (PHRASE)</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 28 (COMMON TERMS)</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>ror not registered</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+<h2>No Match Counts</h2>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>ROR_ID</th>
+      <th>no_match_count</th>
+      <th>id</th>
+      <th>names.types.ror_display</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>https://ror.org/04qw24q55</td>
+      <td>1862</td>
+      <td>https://ror.org/04qw24q55</td>
+      <td>Wageningen University &amp; Research</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03vek6s52</td>
+      <td>109</td>
+      <td>https://ror.org/03vek6s52</td>
+      <td>Harvard University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01bj3aw27</td>
+      <td>92</td>
+      <td>https://ror.org/01bj3aw27</td>
+      <td>United States Department of Energy</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01yc7t268</td>
+      <td>64</td>
+      <td>https://ror.org/01yc7t268</td>
+      <td>Washington University in St. Louis</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00mkhxb43</td>
+      <td>48</td>
+      <td>https://ror.org/00mkhxb43</td>
+      <td>University of Notre Dame</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04rq5mt64</td>
+      <td>44</td>
+      <td>https://ror.org/04rq5mt64</td>
+      <td>University of Maryland, Baltimore</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00yq55g44</td>
+      <td>40</td>
+      <td>https://ror.org/00yq55g44</td>
+      <td>Witten/Herdecke University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03v76x132</td>
+      <td>28</td>
+      <td>https://ror.org/03v76x132</td>
+      <td>Yale University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02etsyv71</td>
+      <td>27</td>
+      <td>https://ror.org/02etsyv71</td>
+      <td>Russian Economic University after G.V. Plekhanov</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02feahw73</td>
+      <td>18</td>
+      <td>https://ror.org/02feahw73</td>
+      <td>Centre National de la Recherche Scientifique</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02gfc7t72</td>
+      <td>13</td>
+      <td>https://ror.org/02gfc7t72</td>
+      <td>Consejo Superior de Investigaciones Científicas</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03wmf1y16</td>
+      <td>13</td>
+      <td>https://ror.org/03wmf1y16</td>
+      <td>University of Colorado Anschutz Medical Campus</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04cf69335</td>
+      <td>12</td>
+      <td>https://ror.org/04cf69335</td>
+      <td>Washington University in St. Louis School of Medicine</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05ww3wq27</td>
+      <td>11</td>
+      <td>https://ror.org/05ww3wq27</td>
+      <td>HEC Montréal</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03pvyf116</td>
+      <td>11</td>
+      <td>https://ror.org/03pvyf116</td>
+      <td>Dana-Farber/Harvard Cancer Center</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/042nb2s44</td>
+      <td>11</td>
+      <td>https://ror.org/042nb2s44</td>
+      <td>Massachusetts Institute of Technology</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/0202bj006</td>
+      <td>11</td>
+      <td>https://ror.org/0202bj006</td>
+      <td>Sheng Jing Hospital</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01tgyzw49</td>
+      <td>10</td>
+      <td>https://ror.org/01tgyzw49</td>
+      <td>National University of Singapore</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/036yvre49</td>
+      <td>10</td>
+      <td>https://ror.org/036yvre49</td>
+      <td>Kemerovo State University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03kpps236</td>
+      <td>9</td>
+      <td>https://ror.org/03kpps236</td>
+      <td>Barcelona Institute for Science and Technology</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04374qe70</td>
+      <td>9</td>
+      <td>https://ror.org/04374qe70</td>
+      <td>SickKids Foundation</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00j0x9b96</td>
+      <td>8</td>
+      <td>https://ror.org/00j0x9b96</td>
+      <td>Ulyanovsk State Pedagogical University Named After I. Ulyanov</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02vjkv261</td>
+      <td>8</td>
+      <td>https://ror.org/02vjkv261</td>
+      <td>Inserm</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00za53h95</td>
+      <td>8</td>
+      <td>https://ror.org/00za53h95</td>
+      <td>Johns Hopkins University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04r1cxt79</td>
+      <td>7</td>
+      <td>https://ror.org/04r1cxt79</td>
+      <td>Kenya Medical Research Institute</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/021wm7p51</td>
+      <td>7</td>
+      <td>https://ror.org/021wm7p51</td>
+      <td>Council of Scientific and Industrial Research</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03gds6c39</td>
+      <td>7</td>
+      <td>https://ror.org/03gds6c39</td>
+      <td>The University of Texas Health Science Center at Houston</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/001z21q04</td>
+      <td>7</td>
+      <td>https://ror.org/001z21q04</td>
+      <td>Sorbonne Paris Cité</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02v51f717</td>
+      <td>6</td>
+      <td>https://ror.org/02v51f717</td>
+      <td>Peking University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/049mpkx27</td>
+      <td>6</td>
+      <td>https://ror.org/049mpkx27</td>
+      <td>Shriners Hospitals for Children - St. Louis</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/032e6b942</td>
+      <td>6</td>
+      <td>https://ror.org/032e6b942</td>
+      <td>Alfred-Wegener-Institut Helmholtz-Zentrum für Polar- und Meeresforschung</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/032h4fk17</td>
+      <td>6</td>
+      <td>https://ror.org/032h4fk17</td>
+      <td>San Francisco Zoo</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03cqe8w59</td>
+      <td>6</td>
+      <td>https://ror.org/03cqe8w59</td>
+      <td>Consejo Nacional de Investigaciones Científicas y Técnicas</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01k9v9b21</td>
+      <td>6</td>
+      <td>https://ror.org/01k9v9b21</td>
+      <td>Indianapolis Zoo</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00zbnzw74</td>
+      <td>6</td>
+      <td>https://ror.org/00zbnzw74</td>
+      <td>Stratford University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/036c27j91</td>
+      <td>5</td>
+      <td>https://ror.org/036c27j91</td>
+      <td>Washington University Medical Center</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00tw3jy02</td>
+      <td>5</td>
+      <td>https://ror.org/00tw3jy02</td>
+      <td>MRC Laboratory of Molecular Biology</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00q16t150</td>
+      <td>5</td>
+      <td>https://ror.org/00q16t150</td>
+      <td>University of Texas Health Science Center at Dallas</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/021036w13</td>
+      <td>5</td>
+      <td>https://ror.org/021036w13</td>
+      <td>Belarusian State University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01n9kga30</td>
+      <td>4</td>
+      <td>https://ror.org/01n9kga30</td>
+      <td>Duke University School of Medicine</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01w6qp003</td>
+      <td>4</td>
+      <td>https://ror.org/01w6qp003</td>
+      <td>University of Veterinary Medicine Vienna</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02c4ez492</td>
+      <td>4</td>
+      <td>https://ror.org/02c4ez492</td>
+      <td>Hershey (United States)</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05t45gr77</td>
+      <td>4</td>
+      <td>https://ror.org/05t45gr77</td>
+      <td>Wuhan Center for Disease Control and Prevention</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04q84b570</td>
+      <td>4</td>
+      <td>https://ror.org/04q84b570</td>
+      <td>World Health Organization - Lyon Office</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00hx57361</td>
+      <td>4</td>
+      <td>https://ror.org/00hx57361</td>
+      <td>Princeton University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/043mz5j54</td>
+      <td>4</td>
+      <td>https://ror.org/043mz5j54</td>
+      <td>University of California, San Francisco</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/006a7pj43</td>
+      <td>4</td>
+      <td>https://ror.org/006a7pj43</td>
+      <td>Centre hospitalier universitaire de Québec</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03pnmqc26</td>
+      <td>4</td>
+      <td>https://ror.org/03pnmqc26</td>
+      <td>Yale School of Medicine</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01xdqrp08</td>
+      <td>4</td>
+      <td>https://ror.org/01xdqrp08</td>
+      <td>Pfizer (United States)</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/038t36y30</td>
+      <td>4</td>
+      <td>https://ror.org/038t36y30</td>
+      <td>Heidelberg University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/027vj4x92</td>
+      <td>4</td>
+      <td>https://ror.org/027vj4x92</td>
+      <td>Sanofi (United States)</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/004rtk039</td>
+      <td>4</td>
+      <td>https://ror.org/004rtk039</td>
+      <td>Japan Agency for Medical Research and Development</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02jqc0m91</td>
+      <td>4</td>
+      <td>https://ror.org/02jqc0m91</td>
+      <td>Seattle University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03ydkyb10</td>
+      <td>4</td>
+      <td>https://ror.org/03ydkyb10</td>
+      <td>University of Wisconsin System</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/025fyfd20</td>
+      <td>4</td>
+      <td>https://ror.org/025fyfd20</td>
+      <td>Children's Hospital of Zhejiang University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02ks8qq67</td>
+      <td>4</td>
+      <td>https://ror.org/02ks8qq67</td>
+      <td>Hungarian Academy of Sciences</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05tkyf982</td>
+      <td>4</td>
+      <td>https://ror.org/05tkyf982</td>
+      <td>Ben-Gurion University of the Negev</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01esghr10</td>
+      <td>4</td>
+      <td>https://ror.org/01esghr10</td>
+      <td>Columbia University Irving Medical Center</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03eqttr49</td>
+      <td>4</td>
+      <td>https://ror.org/03eqttr49</td>
+      <td>Research Triangle Park Foundation</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/003tsz145</td>
+      <td>4</td>
+      <td>https://ror.org/003tsz145</td>
+      <td>Frauenklinik der Technischen Universität München</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04vmvtb21</td>
+      <td>4</td>
+      <td>https://ror.org/04vmvtb21</td>
+      <td>Tulane University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01zgy1s35</td>
+      <td>4</td>
+      <td>https://ror.org/01zgy1s35</td>
+      <td>University Medical Center Hamburg-Eppendorf</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00d55g310</td>
+      <td>4</td>
+      <td>https://ror.org/00d55g310</td>
+      <td>Transbaikal State University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/020z26690</td>
+      <td>4</td>
+      <td>https://ror.org/020z26690</td>
+      <td>Moscow State Linguistic University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03xswyc88</td>
+      <td>4</td>
+      <td>https://ror.org/03xswyc88</td>
+      <td>Reproductive Medicine Associates of New York</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01y2jtd41</td>
+      <td>4</td>
+      <td>https://ror.org/01y2jtd41</td>
+      <td>University of Wisconsin–Madison</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03egfjv78</td>
+      <td>4</td>
+      <td>https://ror.org/03egfjv78</td>
+      <td>France Parkinson</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03jp40720</td>
+      <td>4</td>
+      <td>https://ror.org/03jp40720</td>
+      <td>Mayo Clinic in Arizona</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/043cec594</td>
+      <td>4</td>
+      <td>https://ror.org/043cec594</td>
+      <td>AstraZeneca (United States)</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04a7f6w43</td>
+      <td>4</td>
+      <td>https://ror.org/04a7f6w43</td>
+      <td>Max Planck Institute of Experimental Medicine</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/046rm7j60</td>
+      <td>4</td>
+      <td>https://ror.org/046rm7j60</td>
+      <td>University of California, Los Angeles</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05av6m066</td>
+      <td>4</td>
+      <td>https://ror.org/05av6m066</td>
+      <td>United States Marine Corps</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00tdyb139</td>
+      <td>4</td>
+      <td>https://ror.org/00tdyb139</td>
+      <td>Carnegie Department of Plant Biology</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05a28rw58</td>
+      <td>4</td>
+      <td>https://ror.org/05a28rw58</td>
+      <td>ETH Zurich</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05eqycp84</td>
+      <td>4</td>
+      <td>https://ror.org/05eqycp84</td>
+      <td>Cheng Ching Hospital</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00by1q217</td>
+      <td>4</td>
+      <td>https://ror.org/00by1q217</td>
+      <td>Roche (Switzerland)</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/037zgn354</td>
+      <td>3</td>
+      <td>https://ror.org/037zgn354</td>
+      <td>Johns Hopkins Medicine</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/0294hxs80</td>
+      <td>3</td>
+      <td>https://ror.org/0294hxs80</td>
+      <td>California State University Los Angeles</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/056d84691</td>
+      <td>3</td>
+      <td>https://ror.org/056d84691</td>
+      <td>Karolinska Institutet</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01cwqze88</td>
+      <td>3</td>
+      <td>https://ror.org/01cwqze88</td>
+      <td>National Institutes of Health</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05krs5044</td>
+      <td>3</td>
+      <td>https://ror.org/05krs5044</td>
+      <td>University of Sheffield</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00jmfr291</td>
+      <td>3</td>
+      <td>https://ror.org/00jmfr291</td>
+      <td>University of Michigan–Ann Arbor</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05dk0ce17</td>
+      <td>3</td>
+      <td>https://ror.org/05dk0ce17</td>
+      <td>Washington State University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/012cvds63</td>
+      <td>3</td>
+      <td>https://ror.org/012cvds63</td>
+      <td>Leidos (United States)</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/054vayn55</td>
+      <td>3</td>
+      <td>https://ror.org/054vayn55</td>
+      <td>Consorci Institut D'Investigacions Biomediques August Pi I Sunyer</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05vt9qd57</td>
+      <td>3</td>
+      <td>https://ror.org/05vt9qd57</td>
+      <td>Rutgers, The State University of New Jersey</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/049s0rh22</td>
+      <td>3</td>
+      <td>https://ror.org/049s0rh22</td>
+      <td>Dartmouth College</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01y9bpm73</td>
+      <td>3</td>
+      <td>https://ror.org/01y9bpm73</td>
+      <td>University of Göttingen</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05v9kya57</td>
+      <td>3</td>
+      <td>https://ror.org/05v9kya57</td>
+      <td>Pázmány Péter Catholic University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02s376052</td>
+      <td>3</td>
+      <td>https://ror.org/02s376052</td>
+      <td>École Polytechnique Fédérale de Lausanne</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04z4kmw33</td>
+      <td>3</td>
+      <td>https://ror.org/04z4kmw33</td>
+      <td>Melbourne Health</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01yr73893</td>
+      <td>2</td>
+      <td>https://ror.org/01yr73893</td>
+      <td>European Molecular Biology Laboratory</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00trqv719</td>
+      <td>2</td>
+      <td>https://ror.org/00trqv719</td>
+      <td>University of Rochester Medical Center</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01aj84f44</td>
+      <td>2</td>
+      <td>https://ror.org/01aj84f44</td>
+      <td>Aarhus University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/0051rme32</td>
+      <td>2</td>
+      <td>https://ror.org/0051rme32</td>
+      <td>Northwest A&amp;F University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/001w7jn25</td>
+      <td>2</td>
+      <td>https://ror.org/001w7jn25</td>
+      <td>Charité - Universitätsmedizin Berlin</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01sby4e06</td>
+      <td>2</td>
+      <td>https://ror.org/01sby4e06</td>
+      <td>Nizhny Novgorod State Conservatory named after M.I. Glinka</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03y9bvk93</td>
+      <td>2</td>
+      <td>https://ror.org/03y9bvk93</td>
+      <td>Bolton NHS Foundation Trust</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01jsq2704</td>
+      <td>2</td>
+      <td>https://ror.org/01jsq2704</td>
+      <td>Eötvös Loránd University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05dxps055</td>
+      <td>2</td>
+      <td>https://ror.org/05dxps055</td>
+      <td>California Institute of Technology</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03t4gr691</td>
+      <td>2</td>
+      <td>https://ror.org/03t4gr691</td>
+      <td>Academic Medical Center</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/0220qvk04</td>
+      <td>2</td>
+      <td>https://ror.org/0220qvk04</td>
+      <td>Shanghai Jiao Tong University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/006teas31</td>
+      <td>2</td>
+      <td>https://ror.org/006teas31</td>
+      <td>Shanghai University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05qsezp22</td>
+      <td>2</td>
+      <td>https://ror.org/05qsezp22</td>
+      <td>Agencia de Salud Pública de Barcelona</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/0161xgx34</td>
+      <td>2</td>
+      <td>https://ror.org/0161xgx34</td>
+      <td>Université de Montréal</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00zm4rq24</td>
+      <td>2</td>
+      <td>https://ror.org/00zm4rq24</td>
+      <td>University of New Haven</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/023b0x485</td>
+      <td>2</td>
+      <td>https://ror.org/023b0x485</td>
+      <td>Johannes Gutenberg University Mainz</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02qm18h86</td>
+      <td>2</td>
+      <td>https://ror.org/02qm18h86</td>
+      <td>VA Pittsburgh Healthcare System</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/027pk6j83</td>
+      <td>2</td>
+      <td>https://ror.org/027pk6j83</td>
+      <td>Madrid Institute for Advanced Studies</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05g1k4d79</td>
+      <td>2</td>
+      <td>https://ror.org/05g1k4d79</td>
+      <td>North-Caucasus Federal University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05t99sp05</td>
+      <td>2</td>
+      <td>https://ror.org/05t99sp05</td>
+      <td>California Coast University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03wxxbs05</td>
+      <td>2</td>
+      <td>https://ror.org/03wxxbs05</td>
+      <td>Research Centre for the Humanities</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00sdcjz77</td>
+      <td>2</td>
+      <td>https://ror.org/00sdcjz77</td>
+      <td>Shenzhen Bay Laboratory</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/0403jak37</td>
+      <td>2</td>
+      <td>https://ror.org/0403jak37</td>
+      <td>Al Baha University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03efmqc40</td>
+      <td>2</td>
+      <td>https://ror.org/03efmqc40</td>
+      <td>Arizona State University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04nm1cv11</td>
+      <td>2</td>
+      <td>https://ror.org/04nm1cv11</td>
+      <td>University Hospitals Bristol NHS Foundation Trust</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/0107w4315</td>
+      <td>2</td>
+      <td>https://ror.org/0107w4315</td>
+      <td>University of Colorado Health</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/036c9yv20</td>
+      <td>2</td>
+      <td>https://ror.org/036c9yv20</td>
+      <td>University of Kansas Medical Center</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01rvn4p91</td>
+      <td>2</td>
+      <td>https://ror.org/01rvn4p91</td>
+      <td>Board of the Swiss Federal Institutes of Technology</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/006e5kg04</td>
+      <td>2</td>
+      <td>https://ror.org/006e5kg04</td>
+      <td>Vrije Universiteit Brussel</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03ps5d564</td>
+      <td>2</td>
+      <td>https://ror.org/03ps5d564</td>
+      <td>Boston University School of Medicine</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02r0e4r58</td>
+      <td>2</td>
+      <td>https://ror.org/02r0e4r58</td>
+      <td>Jülich Aachen Research Alliance</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03g03ge92</td>
+      <td>2</td>
+      <td>https://ror.org/03g03ge92</td>
+      <td>Amgen (United States)</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00f54p054</td>
+      <td>2</td>
+      <td>https://ror.org/00f54p054</td>
+      <td>Stanford University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/010j2gw05</td>
+      <td>2</td>
+      <td>https://ror.org/010j2gw05</td>
+      <td>CEA Paris-Saclay - Etablissement de Fontenay-aux-roses</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04mhzgx49</td>
+      <td>2</td>
+      <td>https://ror.org/04mhzgx49</td>
+      <td>Tel Aviv University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04r9x1a08</td>
+      <td>2</td>
+      <td>https://ror.org/04r9x1a08</td>
+      <td>AstraZeneca (United Kingdom)</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02ryrf141</td>
+      <td>2</td>
+      <td>https://ror.org/02ryrf141</td>
+      <td>Van Lang University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04v00sg98</td>
+      <td>2</td>
+      <td>https://ror.org/04v00sg98</td>
+      <td>VA Boston Healthcare System</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/042pgcv68</td>
+      <td>2</td>
+      <td>https://ror.org/042pgcv68</td>
+      <td>China Academy of Chinese Medical Sciences</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/051fd9666</td>
+      <td>2</td>
+      <td>https://ror.org/051fd9666</td>
+      <td>Case Western Reserve University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/0493xsw21</td>
+      <td>2</td>
+      <td>https://ror.org/0493xsw21</td>
+      <td>Berlin Institute of Health at Charité - Universitätsmedizin Berlin</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00e5k0821</td>
+      <td>2</td>
+      <td>https://ror.org/00e5k0821</td>
+      <td>New York University Abu Dhabi</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05hag2y10</td>
+      <td>2</td>
+      <td>https://ror.org/05hag2y10</td>
+      <td>Universidade Federal do Acre</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/0268ecp52</td>
+      <td>2</td>
+      <td>https://ror.org/0268ecp52</td>
+      <td>Paris-Est Sup</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00pd74e08</td>
+      <td>2</td>
+      <td>https://ror.org/00pd74e08</td>
+      <td>University of Münster</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/0093wrd09</td>
+      <td>2</td>
+      <td>https://ror.org/0093wrd09</td>
+      <td>Volgograd State University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/029brtt94</td>
+      <td>2</td>
+      <td>https://ror.org/029brtt94</td>
+      <td>Université Claude Bernard Lyon 1</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03858r716</td>
+      <td>2</td>
+      <td>https://ror.org/03858r716</td>
+      <td>National Kaohsiung First University of Science and Technology</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/005cqsz63</td>
+      <td>2</td>
+      <td>https://ror.org/005cqsz63</td>
+      <td>Hungarian Research Centre for Linguistics</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00gtg0p11</td>
+      <td>2</td>
+      <td>https://ror.org/00gtg0p11</td>
+      <td>Centre Île-de-France - Jouy-en-Josas - Antony</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/059gcgy73</td>
+      <td>2</td>
+      <td>https://ror.org/059gcgy73</td>
+      <td>Nanjing Medical University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04pyb7y63</td>
+      <td>2</td>
+      <td>https://ror.org/04pyb7y63</td>
+      <td>International Flame Research Foundation</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01y64my43</td>
+      <td>2</td>
+      <td>https://ror.org/01y64my43</td>
+      <td>University at Buffalo, State University of New York</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01tqkhn82</td>
+      <td>2</td>
+      <td>https://ror.org/01tqkhn82</td>
+      <td>Shandong Entry-Exit Inspection and Quarantine Bureau</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/010cncq09</td>
+      <td>2</td>
+      <td>https://ror.org/010cncq09</td>
+      <td>Magnetic Resonance Imaging Institute for Biomedical Research</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00hj8s172</td>
+      <td>2</td>
+      <td>https://ror.org/00hj8s172</td>
+      <td>Columbia University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00fq5cm18</td>
+      <td>2</td>
+      <td>https://ror.org/00fq5cm18</td>
+      <td>National Institute on Drug Abuse</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05g916f28</td>
+      <td>2</td>
+      <td>https://ror.org/05g916f28</td>
+      <td>Translational Sciences (United States)</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01h8pf755</td>
+      <td>2</td>
+      <td>https://ror.org/01h8pf755</td>
+      <td>Institut National des Sciences Appliquées de Toulouse</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03zbnzt98</td>
+      <td>2</td>
+      <td>https://ror.org/03zbnzt98</td>
+      <td>Woods Hole Oceanographic Institution</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/059cjpv64</td>
+      <td>2</td>
+      <td>https://ror.org/059cjpv64</td>
+      <td>Second Affiliated Hospital of Zhejiang University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01xtthb56</td>
+      <td>2</td>
+      <td>https://ror.org/01xtthb56</td>
+      <td>University of Oslo</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/014743444</td>
+      <td>2</td>
+      <td>https://ror.org/014743444</td>
+      <td>Forschungsinstitut für Wärmeschutz München</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01qat3289</td>
+      <td>2</td>
+      <td>https://ror.org/01qat3289</td>
+      <td>Eli Lilly (United States)</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00ca2c886</td>
+      <td>2</td>
+      <td>https://ror.org/00ca2c886</td>
+      <td>Instituto de Salud Carlos III</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05n8ah907</td>
+      <td>2</td>
+      <td>https://ror.org/05n8ah907</td>
+      <td>Unilever (United Kingdom)</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05tf9r976</td>
+      <td>2</td>
+      <td>https://ror.org/05tf9r976</td>
+      <td>Chinese People's Liberation Army</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02se0t636</td>
+      <td>2</td>
+      <td>https://ror.org/02se0t636</td>
+      <td>Leibniz Institute of Photonic Technology</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02b4apg34</td>
+      <td>2</td>
+      <td>https://ror.org/02b4apg34</td>
+      <td>Escuela Politécnica Javeriana del Ecuador</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04gzb3214</td>
+      <td>2</td>
+      <td>https://ror.org/04gzb3214</td>
+      <td>Yamazaki Gakuen University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00f7hpc57</td>
+      <td>2</td>
+      <td>https://ror.org/00f7hpc57</td>
+      <td>Friedrich-Alexander-Universität Erlangen-Nürnberg</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01d1z8s73</td>
+      <td>2</td>
+      <td>https://ror.org/01d1z8s73</td>
+      <td>Rostov State University of Economics</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05ggc9x40</td>
+      <td>2</td>
+      <td>https://ror.org/05ggc9x40</td>
+      <td>Université Paris-Est Créteil</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05txkk980</td>
+      <td>2</td>
+      <td>https://ror.org/05txkk980</td>
+      <td>Hospital Universitario Infanta Cristina</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00bq4rw46</td>
+      <td>2</td>
+      <td>https://ror.org/00bq4rw46</td>
+      <td>Hospital Italiano de Buenos Aires</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05rcxtd95</td>
+      <td>2</td>
+      <td>https://ror.org/05rcxtd95</td>
+      <td>Fondazione Santa Lucia</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/032ghem84</td>
+      <td>2</td>
+      <td>https://ror.org/032ghem84</td>
+      <td>Reial Acadèmia de Ciències i Arts de Barcelona</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00dr1cn74</td>
+      <td>2</td>
+      <td>https://ror.org/00dr1cn74</td>
+      <td>Hangzhou Center for Disease Control and Prevention</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/0130frc33</td>
+      <td>2</td>
+      <td>https://ror.org/0130frc33</td>
+      <td>University of North Carolina at Chapel Hill</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05c1yfj14</td>
+      <td>2</td>
+      <td>https://ror.org/05c1yfj14</td>
+      <td>Xiangya Hospital Central South University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03a26mh11</td>
+      <td>2</td>
+      <td>https://ror.org/03a26mh11</td>
+      <td>Laboratoire de Physique de l'ENS</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01hcyya48</td>
+      <td>2</td>
+      <td>https://ror.org/01hcyya48</td>
+      <td>Cincinnati Children's Hospital Medical Center</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01jmxt844</td>
+      <td>2</td>
+      <td>https://ror.org/01jmxt844</td>
+      <td>University of Otago</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01yb10j39</td>
+      <td>2</td>
+      <td>https://ror.org/01yb10j39</td>
+      <td>Radboud Institute for Molecular Life Sciences</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05ykr0121</td>
+      <td>2</td>
+      <td>https://ror.org/05ykr0121</td>
+      <td>San Francisco State University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05pp39346</td>
+      <td>2</td>
+      <td>https://ror.org/05pp39346</td>
+      <td>Haifa Medical Center</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/023te5r95</td>
+      <td>2</td>
+      <td>https://ror.org/023te5r95</td>
+      <td>Fifth Affiliated Hospital of Sun Yat-sen University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/052133d12</td>
+      <td>2</td>
+      <td>https://ror.org/052133d12</td>
+      <td>University of Indianapolis</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/0575yy874</td>
+      <td>2</td>
+      <td>https://ror.org/0575yy874</td>
+      <td>University Medical Center Utrecht</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02tphfq59</td>
+      <td>2</td>
+      <td>https://ror.org/02tphfq59</td>
+      <td>National University of Rosario</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/021ft0n22</td>
+      <td>2</td>
+      <td>https://ror.org/021ft0n22</td>
+      <td>Universitätsmedizin Göttingen</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/025vn3989</td>
+      <td>2</td>
+      <td>https://ror.org/025vn3989</td>
+      <td>GlaxoSmithKline (United States)</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02jxrhq31</td>
+      <td>2</td>
+      <td>https://ror.org/02jxrhq31</td>
+      <td>Melanoma Institute Australia</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/023h0re83</td>
+      <td>2</td>
+      <td>https://ror.org/023h0re83</td>
+      <td>Hawaii Cancer Care</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02crff812</td>
+      <td>2</td>
+      <td>https://ror.org/02crff812</td>
+      <td>University of Zurich</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03kpdys72</td>
+      <td>2</td>
+      <td>https://ror.org/03kpdys72</td>
+      <td>Triemli Hospital</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02917wp91</td>
+      <td>2</td>
+      <td>https://ror.org/02917wp91</td>
+      <td>Hospital of the University of Pennsylvania</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/026sv7t11</td>
+      <td>2</td>
+      <td>https://ror.org/026sv7t11</td>
+      <td>Qingdao National Laboratory for Marine Science and Technology</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01xsqw823</td>
+      <td>2</td>
+      <td>https://ror.org/01xsqw823</td>
+      <td>GlaxoSmithKline (United Kingdom)</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03b6f4629</td>
+      <td>2</td>
+      <td>https://ror.org/03b6f4629</td>
+      <td>Institut de Recerca en Energia de Catalunya</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04tm3k558</td>
+      <td>2</td>
+      <td>https://ror.org/04tm3k558</td>
+      <td>Third Affiliated Hospital of Sun Yat-sen University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00vbvha87</td>
+      <td>2</td>
+      <td>https://ror.org/00vbvha87</td>
+      <td>Public Health England</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/000xsnr85</td>
+      <td>2</td>
+      <td>https://ror.org/000xsnr85</td>
+      <td>University of the Basque Country</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/0220f5b41</td>
+      <td>2</td>
+      <td>https://ror.org/0220f5b41</td>
+      <td>Tokyo Dental College</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/006w34k90</td>
+      <td>2</td>
+      <td>https://ror.org/006w34k90</td>
+      <td>Howard Hughes Medical Institute</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02mgw3155</td>
+      <td>2</td>
+      <td>https://ror.org/02mgw3155</td>
+      <td>Centre de Recherche en Cancérologie de Lyon</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/041xzk838</td>
+      <td>2</td>
+      <td>https://ror.org/041xzk838</td>
+      <td>Instituto Biofisika</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02r109517</td>
+      <td>2</td>
+      <td>https://ror.org/02r109517</td>
+      <td>Weill Cornell Medicine</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04w908n49</td>
+      <td>2</td>
+      <td>https://ror.org/04w908n49</td>
+      <td>Center for the Study of State and Society</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04cqn7d42</td>
+      <td>2</td>
+      <td>https://ror.org/04cqn7d42</td>
+      <td>University of Colorado Cancer Center</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01tx6pn92</td>
+      <td>2</td>
+      <td>https://ror.org/01tx6pn92</td>
+      <td>Texas A&amp;M Health Science Center</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00v47pv90</td>
+      <td>2</td>
+      <td>https://ror.org/00v47pv90</td>
+      <td>Baptist Health South Florida</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04gqr8882</td>
+      <td>2</td>
+      <td>https://ror.org/04gqr8882</td>
+      <td>Oncology Hematology Care</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00aps1a34</td>
+      <td>2</td>
+      <td>https://ror.org/00aps1a34</td>
+      <td>NIHR Oxford Musculoskeletal Biomedical Research Centre</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/013x0ky90</td>
+      <td>2</td>
+      <td>https://ror.org/013x0ky90</td>
+      <td>Alexander Fleming Biomedical Sciences Research Center</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02785qs39</td>
+      <td>2</td>
+      <td>https://ror.org/02785qs39</td>
+      <td>Institut de Génétique Moléculaire de Montpellier</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02g87qh62</td>
+      <td>2</td>
+      <td>https://ror.org/02g87qh62</td>
+      <td>Centro de Investigación Biomédica en Red</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00wd70b02</td>
+      <td>2</td>
+      <td>https://ror.org/00wd70b02</td>
+      <td>Pennsylvania Department of Environmental Protection</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03wgqqb38</td>
+      <td>2</td>
+      <td>https://ror.org/03wgqqb38</td>
+      <td>Beijing HuiLongGuan Hospital</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02smfhw86</td>
+      <td>2</td>
+      <td>https://ror.org/02smfhw86</td>
+      <td>Virginia Tech</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04v3ywz14</td>
+      <td>2</td>
+      <td>https://ror.org/04v3ywz14</td>
+      <td>China Agricultural University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/032b8d361</td>
+      <td>2</td>
+      <td>https://ror.org/032b8d361</td>
+      <td>Minneapolis VA Medical Center</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/0015ws592</td>
+      <td>2</td>
+      <td>https://ror.org/0015ws592</td>
+      <td>Institut de génétique et de biologie moléculaire et cellulaire</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/039zxt351</td>
+      <td>2</td>
+      <td>https://ror.org/039zxt351</td>
+      <td>IRCCS Ospedale San Raffaele</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/016tfm930</td>
+      <td>2</td>
+      <td>https://ror.org/016tfm930</td>
+      <td>The University of Texas Medical Branch at Galveston</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05qwgg493</td>
+      <td>2</td>
+      <td>https://ror.org/05qwgg493</td>
+      <td>Boston University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01pnej532</td>
+      <td>2</td>
+      <td>https://ror.org/01pnej532</td>
+      <td>University of Szeged</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/010b9wj87</td>
+      <td>2</td>
+      <td>https://ror.org/010b9wj87</td>
+      <td>Boston Medical Center</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02rx3b187</td>
+      <td>2</td>
+      <td>https://ror.org/02rx3b187</td>
+      <td>Université Grenoble Alpes</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05tb9de28</td>
+      <td>2</td>
+      <td>https://ror.org/05tb9de28</td>
+      <td>Charlesson (United States)</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03d04qg82</td>
+      <td>2</td>
+      <td>https://ror.org/03d04qg82</td>
+      <td>Croatian Academy of Sciences and Arts</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/053avzc18</td>
+      <td>2</td>
+      <td>https://ror.org/053avzc18</td>
+      <td>Czech Academy of Sciences</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01f5ytq51</td>
+      <td>2</td>
+      <td>https://ror.org/01f5ytq51</td>
+      <td>Texas A&amp;M University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/0495fxg12</td>
+      <td>2</td>
+      <td>https://ror.org/0495fxg12</td>
+      <td>Institut Pasteur</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/0175hh227</td>
+      <td>2</td>
+      <td>https://ror.org/0175hh227</td>
+      <td>Conservatoire National des Arts et Métiers</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04s1nv328</td>
+      <td>2</td>
+      <td>https://ror.org/04s1nv328</td>
+      <td>University of Canberra</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05yndxy10</td>
+      <td>2</td>
+      <td>https://ror.org/05yndxy10</td>
+      <td>UCSF Helen Diller Family Comprehensive Cancer Center</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01v5xwf23</td>
+      <td>2</td>
+      <td>https://ror.org/01v5xwf23</td>
+      <td>Nestlé (Switzerland)</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/045ydbe97</td>
+      <td>2</td>
+      <td>https://ror.org/045ydbe97</td>
+      <td>Institutos Nacionais de Ciência e Tecnologia</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/037p24858</td>
+      <td>2</td>
+      <td>https://ror.org/037p24858</td>
+      <td>The First Affiliated Hospital, Sun Yat-sen University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02cp04407</td>
+      <td>2</td>
+      <td>https://ror.org/02cp04407</td>
+      <td>Université de Limoges</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/0116vew40</td>
+      <td>2</td>
+      <td>https://ror.org/0116vew40</td>
+      <td>Fundación para el Fomento de la Investigación Sanitaria y Biomédica de la Comunitat Valenciana</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04dpcyn69</td>
+      <td>2</td>
+      <td>https://ror.org/04dpcyn69</td>
+      <td>Kanagawa Prefectural Museum of Cultural History</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/0081fs513</td>
+      <td>2</td>
+      <td>https://ror.org/0081fs513</td>
+      <td>University of Buenos Aires</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03czfpz43</td>
+      <td>2</td>
+      <td>https://ror.org/03czfpz43</td>
+      <td>Emory University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01aaptx40</td>
+      <td>2</td>
+      <td>https://ror.org/01aaptx40</td>
+      <td>Indiana University Health</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/043pwc612</td>
+      <td>2</td>
+      <td>https://ror.org/043pwc612</td>
+      <td>Universidade do Porto</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03qxff017</td>
+      <td>2</td>
+      <td>https://ror.org/03qxff017</td>
+      <td>Hebrew University of Jerusalem</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03fw2bn12</td>
+      <td>2</td>
+      <td>https://ror.org/03fw2bn12</td>
+      <td>Centre d'Imagerie BioMedicale</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02mpq6x41</td>
+      <td>2</td>
+      <td>https://ror.org/02mpq6x41</td>
+      <td>University of Illinois Chicago</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00yfw2296</td>
+      <td>2</td>
+      <td>https://ror.org/00yfw2296</td>
+      <td>Istituto Officina dei Materiali</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/012k1v959</td>
+      <td>2</td>
+      <td>https://ror.org/012k1v959</td>
+      <td>Munich University of Applied Sciences</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/0106qb496</td>
+      <td>1</td>
+      <td>https://ror.org/0106qb496</td>
+      <td>Inner Mongolia University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04cwap208</td>
+      <td>1</td>
+      <td>https://ror.org/04cwap208</td>
+      <td>Inner Mongolia University for Nationalities</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04wjk1035</td>
+      <td>1</td>
+      <td>https://ror.org/04wjk1035</td>
+      <td>i3S - Instituto de Investigação e Inovação em Saúde, Universidade do Porto</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01z1bn264</td>
+      <td>1</td>
+      <td>https://ror.org/01z1bn264</td>
+      <td>University of Languages and International Studies</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01zqrxf85</td>
+      <td>1</td>
+      <td>https://ror.org/01zqrxf85</td>
+      <td>Institute of Molecular Biotechnology</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03wjwyj98</td>
+      <td>1</td>
+      <td>https://ror.org/03wjwyj98</td>
+      <td>Eppendorf (Germany)</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04gw3ra78</td>
+      <td>1</td>
+      <td>https://ror.org/04gw3ra78</td>
+      <td>Chinese PLA General Hospital</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/022485d27</td>
+      <td>1</td>
+      <td>https://ror.org/022485d27</td>
+      <td>College of Agriculture at Križevci</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02rrdvm96</td>
+      <td>1</td>
+      <td>https://ror.org/02rrdvm96</td>
+      <td>Center for Excellence in Molecular Cell Science</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/050c3cw24</td>
+      <td>1</td>
+      <td>https://ror.org/050c3cw24</td>
+      <td>Universitat de Lleida</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01pxwe438</td>
+      <td>1</td>
+      <td>https://ror.org/01pxwe438</td>
+      <td>McGill University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00cfam450</td>
+      <td>1</td>
+      <td>https://ror.org/00cfam450</td>
+      <td>Helmholtz Zentrum München</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/005dvqh91</td>
+      <td>1</td>
+      <td>https://ror.org/005dvqh91</td>
+      <td>NYU Langone Health</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04t0gwh46</td>
+      <td>1</td>
+      <td>https://ror.org/04t0gwh46</td>
+      <td>Institut Curie</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02jz4aj89</td>
+      <td>1</td>
+      <td>https://ror.org/02jz4aj89</td>
+      <td>Maastricht University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01hxy9878</td>
+      <td>1</td>
+      <td>https://ror.org/01hxy9878</td>
+      <td>Royal College of Surgeons in Ireland</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00zw9nc64</td>
+      <td>1</td>
+      <td>https://ror.org/00zw9nc64</td>
+      <td>University of Miami Health System</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05ar8rn06</td>
+      <td>1</td>
+      <td>https://ror.org/05ar8rn06</td>
+      <td>Guangzhou University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04v4g9h31</td>
+      <td>1</td>
+      <td>https://ror.org/04v4g9h31</td>
+      <td>University of Thessaly</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01x3kkr08</td>
+      <td>1</td>
+      <td>https://ror.org/01x3kkr08</td>
+      <td>JPMorgan Chase &amp; Co (United States)</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00d0nc645</td>
+      <td>1</td>
+      <td>https://ror.org/00d0nc645</td>
+      <td>Microsoft (United States)</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/045syc608</td>
+      <td>1</td>
+      <td>https://ror.org/045syc608</td>
+      <td>Czech Academy of Sciences, Institute of Molecular Genetics</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04q42nz13</td>
+      <td>1</td>
+      <td>https://ror.org/04q42nz13</td>
+      <td>Institute of Cognitive Neuroscience and Psychology</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04skqfp25</td>
+      <td>1</td>
+      <td>https://ror.org/04skqfp25</td>
+      <td>St. Michael's Hospital</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/050c3pq49</td>
+      <td>1</td>
+      <td>https://ror.org/050c3pq49</td>
+      <td>Fondation pour l’innovation en Cadiométabolisme et Nutrition</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03r4m3349</td>
+      <td>1</td>
+      <td>https://ror.org/03r4m3349</td>
+      <td>Erasmus MC Cancer Institute</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00mv6sv71</td>
+      <td>1</td>
+      <td>https://ror.org/00mv6sv71</td>
+      <td>University of Zagreb</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/0420db125</td>
+      <td>1</td>
+      <td>https://ror.org/0420db125</td>
+      <td>Rockefeller University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01c4pz451</td>
+      <td>1</td>
+      <td>https://ror.org/01c4pz451</td>
+      <td>Tehran University of Medical Sciences</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05r1mzq61</td>
+      <td>1</td>
+      <td>https://ror.org/05r1mzq61</td>
+      <td>Zhuhai Institute of Advanced Technology</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/047s2c258</td>
+      <td>1</td>
+      <td>https://ror.org/047s2c258</td>
+      <td>University of Maryland, College Park</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00kcd6x60</td>
+      <td>1</td>
+      <td>https://ror.org/00kcd6x60</td>
+      <td>Tohoku University Hospital</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03xrhmk39</td>
+      <td>1</td>
+      <td>https://ror.org/03xrhmk39</td>
+      <td>Vlaams Instituut voor Biotechnologie</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01azzms13</td>
+      <td>1</td>
+      <td>https://ror.org/01azzms13</td>
+      <td>Universitat de Miguel Hernández d'Elx</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00hj54h04</td>
+      <td>1</td>
+      <td>https://ror.org/00hj54h04</td>
+      <td>The University of Texas at Austin</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04esvpn06</td>
+      <td>1</td>
+      <td>https://ror.org/04esvpn06</td>
+      <td>Virginia State University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05ghs6f64</td>
+      <td>1</td>
+      <td>https://ror.org/05ghs6f64</td>
+      <td>Montreal Neurological Institute and Hospital</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/0431sk359</td>
+      <td>1</td>
+      <td>https://ror.org/0431sk359</td>
+      <td>Marine Biological Association of the United Kingdom</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04hexsd31</td>
+      <td>1</td>
+      <td>https://ror.org/04hexsd31</td>
+      <td>Geneva Finance Research Institute</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02w7k5y22</td>
+      <td>1</td>
+      <td>https://ror.org/02w7k5y22</td>
+      <td>Datta Meghe Institute of Medical Sciences</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04cvxnb49</td>
+      <td>1</td>
+      <td>https://ror.org/04cvxnb49</td>
+      <td>Goethe University Frankfurt</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03vs46t66</td>
+      <td>1</td>
+      <td>https://ror.org/03vs46t66</td>
+      <td>Université de Cergy-Pontoise</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/033003e23</td>
+      <td>1</td>
+      <td>https://ror.org/033003e23</td>
+      <td>Tampere University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03ap2av50</td>
+      <td>1</td>
+      <td>https://ror.org/03ap2av50</td>
+      <td>Max Planck Institute of Neurobiology</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02qz8b764</td>
+      <td>1</td>
+      <td>https://ror.org/02qz8b764</td>
+      <td>Cold Spring Harbor Laboratory</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/030sbze61</td>
+      <td>1</td>
+      <td>https://ror.org/030sbze61</td>
+      <td>Institute for Molecular Medicine Finland</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/009n8zh45</td>
+      <td>1</td>
+      <td>https://ror.org/009n8zh45</td>
+      <td>The University of Dodoma</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04b6nzv94</td>
+      <td>1</td>
+      <td>https://ror.org/04b6nzv94</td>
+      <td>Brigham and Women's Hospital</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03ymk3103</td>
+      <td>1</td>
+      <td>https://ror.org/03ymk3103</td>
+      <td>University of Washington School of Medicine</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01cmst727</td>
+      <td>1</td>
+      <td>https://ror.org/01cmst727</td>
+      <td>Simons Foundation</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00j4k1h63</td>
+      <td>1</td>
+      <td>https://ror.org/00j4k1h63</td>
+      <td>National Institute of Environmental Health Sciences</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01ztwst47</td>
+      <td>1</td>
+      <td>https://ror.org/01ztwst47</td>
+      <td>University of California - San Francisco School of Medicine</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/043nxc105</td>
+      <td>1</td>
+      <td>https://ror.org/043nxc105</td>
+      <td>Universitat de València</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03z3mg085</td>
+      <td>1</td>
+      <td>https://ror.org/03z3mg085</td>
+      <td>Paracelsus Medical University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05t2njg22</td>
+      <td>1</td>
+      <td>https://ror.org/05t2njg22</td>
+      <td>Institute of Ethnology</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05dq2gs74</td>
+      <td>1</td>
+      <td>https://ror.org/05dq2gs74</td>
+      <td>Vanderbilt University Medical Center</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03cdgfs84</td>
+      <td>1</td>
+      <td>https://ror.org/03cdgfs84</td>
+      <td>Landschaftsverband Westfalen-Lippe</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/0327sr118</td>
+      <td>1</td>
+      <td>https://ror.org/0327sr118</td>
+      <td>DIPF | Leibniz Institute for Research and Information in Education</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/0245cg223</td>
+      <td>1</td>
+      <td>https://ror.org/0245cg223</td>
+      <td>University of Freiburg</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/0145fw131</td>
+      <td>1</td>
+      <td>https://ror.org/0145fw131</td>
+      <td>Hong Kong Baptist University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03gnh5541</td>
+      <td>1</td>
+      <td>https://ror.org/03gnh5541</td>
+      <td>Institute of Science and Technology Austria</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/038207k30</td>
+      <td>1</td>
+      <td>https://ror.org/038207k30</td>
+      <td>Laboratoire Génome et Développement des Plantes</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/012jban78</td>
+      <td>1</td>
+      <td>https://ror.org/012jban78</td>
+      <td>Medical University of South Carolina</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/0509e3289</td>
+      <td>1</td>
+      <td>https://ror.org/0509e3289</td>
+      <td>National Institute of Anthropology and History</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04xeg9z08</td>
+      <td>1</td>
+      <td>https://ror.org/04xeg9z08</td>
+      <td>National Institute of Mental Health</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01t8svj65</td>
+      <td>1</td>
+      <td>https://ror.org/01t8svj65</td>
+      <td>University of California San Francisco Medical Center</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03e3qgk42</td>
+      <td>1</td>
+      <td>https://ror.org/03e3qgk42</td>
+      <td>University of Wisconsin Health</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05qpmg879</td>
+      <td>1</td>
+      <td>https://ror.org/05qpmg879</td>
+      <td>Institut de Biologie Moléculaire et Cellulaire</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03mstc592</td>
+      <td>1</td>
+      <td>https://ror.org/03mstc592</td>
+      <td>European Molecular Biology Laboratory</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04zrf7b53</td>
+      <td>1</td>
+      <td>https://ror.org/04zrf7b53</td>
+      <td>University of Kaiserslautern</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04td37d32</td>
+      <td>1</td>
+      <td>https://ror.org/04td37d32</td>
+      <td>Institut National de la Recherche Scientifique</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02j46qs45</td>
+      <td>1</td>
+      <td>https://ror.org/02j46qs45</td>
+      <td>Masaryk University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00s8vne50</td>
+      <td>1</td>
+      <td>https://ror.org/00s8vne50</td>
+      <td>Yerevan State University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/040r8fr65</td>
+      <td>1</td>
+      <td>https://ror.org/040r8fr65</td>
+      <td>Aarhus University Hospital</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00675rp98</td>
+      <td>1</td>
+      <td>https://ror.org/00675rp98</td>
+      <td>Centre National pour la Recherche Scientifique et Technique (CNRST)</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05mv4rb84</td>
+      <td>1</td>
+      <td>https://ror.org/05mv4rb84</td>
+      <td>Medicines Evaluation Board</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02n96ep67</td>
+      <td>1</td>
+      <td>https://ror.org/02n96ep67</td>
+      <td>East China Normal University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/0011qv509</td>
+      <td>1</td>
+      <td>https://ror.org/0011qv509</td>
+      <td>University of Tennessee Health Science Center</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00rqy9422</td>
+      <td>1</td>
+      <td>https://ror.org/00rqy9422</td>
+      <td>University of Queensland</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/010fzp376</td>
+      <td>1</td>
+      <td>https://ror.org/010fzp376</td>
+      <td>Nanion (Germany)</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05bnh6r87</td>
+      <td>1</td>
+      <td>https://ror.org/05bnh6r87</td>
+      <td>Cornell University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04emwm605</td>
+      <td>1</td>
+      <td>https://ror.org/04emwm605</td>
+      <td>Thales (France)</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04p1xtv71</td>
+      <td>1</td>
+      <td>https://ror.org/04p1xtv71</td>
+      <td>Seagate (United States)</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05m3r1b84</td>
+      <td>1</td>
+      <td>https://ror.org/05m3r1b84</td>
+      <td>Institut de Mathématiques de Bordeaux</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03e76ya46</td>
+      <td>1</td>
+      <td>https://ror.org/03e76ya46</td>
+      <td>Max Planck Institute for Biophysical Chemistry</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05byvp690</td>
+      <td>1</td>
+      <td>https://ror.org/05byvp690</td>
+      <td>The University of Texas Southwestern Medical Center</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05h1kgg64</td>
+      <td>1</td>
+      <td>https://ror.org/05h1kgg64</td>
+      <td>National Institute of Health</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03nxex423</td>
+      <td>1</td>
+      <td>https://ror.org/03nxex423</td>
+      <td>King Center</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/052gg0110</td>
+      <td>1</td>
+      <td>https://ror.org/052gg0110</td>
+      <td>University of Oxford</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04t908e09</td>
+      <td>1</td>
+      <td>https://ror.org/04t908e09</td>
+      <td>Olivia Newton-John Cancer Wellness &amp; Research Centre</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02vwnat91</td>
+      <td>1</td>
+      <td>https://ror.org/02vwnat91</td>
+      <td>London South Bank University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02qte9q33</td>
+      <td>1</td>
+      <td>https://ror.org/02qte9q33</td>
+      <td>University of Stavanger</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/023zg8w32</td>
+      <td>1</td>
+      <td>https://ror.org/023zg8w32</td>
+      <td>Institut National des Langues et Civilisations Orientales</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02nbj1r55</td>
+      <td>1</td>
+      <td>https://ror.org/02nbj1r55</td>
+      <td>Université des Sciences et de la Technologie d'Oran Mohamed Boudiaf</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00cahhs35</td>
+      <td>1</td>
+      <td>https://ror.org/00cahhs35</td>
+      <td>Northwest Watershed Research Center</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02en5vm52</td>
+      <td>1</td>
+      <td>https://ror.org/02en5vm52</td>
+      <td>Sorbonne Université</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/000h6jb29</td>
+      <td>1</td>
+      <td>https://ror.org/000h6jb29</td>
+      <td>Helmholtz Centre for Environmental Research</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00fhc9y79</td>
+      <td>1</td>
+      <td>https://ror.org/00fhc9y79</td>
+      <td>Guangdong University of Foreign Studies</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02qyf5152</td>
+      <td>1</td>
+      <td>https://ror.org/02qyf5152</td>
+      <td>Indian Institute of Technology Bombay</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03ht1xw27</td>
+      <td>1</td>
+      <td>https://ror.org/03ht1xw27</td>
+      <td>Tata Institute of Fundamental Research</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04wwqze12</td>
+      <td>1</td>
+      <td>https://ror.org/04wwqze12</td>
+      <td>Peking University Third Hospital</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/0007sdx38</td>
+      <td>1</td>
+      <td>https://ror.org/0007sdx38</td>
+      <td>BMG (Japan)</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02827ca86</td>
+      <td>1</td>
+      <td>https://ror.org/02827ca86</td>
+      <td>Prince of Wales Hospital</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04a9tmd77</td>
+      <td>1</td>
+      <td>https://ror.org/04a9tmd77</td>
+      <td>Icahn School of Medicine at Mount Sinai</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04zmssz18</td>
+      <td>1</td>
+      <td>https://ror.org/04zmssz18</td>
+      <td>École Normale Supérieure de Lyon</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/020rzx487</td>
+      <td>1</td>
+      <td>https://ror.org/020rzx487</td>
+      <td>Sheba Medical Center</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04dkp9463</td>
+      <td>1</td>
+      <td>https://ror.org/04dkp9463</td>
+      <td>University of Amsterdam</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02ma4wv74</td>
+      <td>1</td>
+      <td>https://ror.org/02ma4wv74</td>
+      <td>King Abdulaziz University</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02t1bej08</td>
+      <td>1</td>
+      <td>https://ror.org/02t1bej08</td>
+      <td>Monash Health</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/026h43663</td>
+      <td>1</td>
+      <td>https://ror.org/026h43663</td>
+      <td>Centre de Recherches Linguistiques sur l'Asie Orientale</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00240q980</td>
+      <td>1</td>
+      <td>https://ror.org/00240q980</td>
+      <td>University of Padua</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05megwx07</td>
+      <td>1</td>
+      <td>https://ror.org/05megwx07</td>
+      <td>Southern California Orthopedic Institute</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01zcpa714</td>
+      <td>1</td>
+      <td>https://ror.org/01zcpa714</td>
+      <td>Michigan Medicine</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04wcf8366</td>
+      <td>1</td>
+      <td>https://ror.org/04wcf8366</td>
+      <td>Georgia Department of Public Health</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02jzt6t86</td>
+      <td>1</td>
+      <td>https://ror.org/02jzt6t86</td>
+      <td>Institute of Human Genetics</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02f5b7n18</td>
+      <td>1</td>
+      <td>https://ror.org/02f5b7n18</td>
+      <td>Max Planck Institute for Chemistry</td>
+    </tr>
+  </tbody>
+</table>

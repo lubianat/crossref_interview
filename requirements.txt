@@ -1,0 +1,9 @@
+matplotlib
+requests
+pandas
+seaborn
+plotly
+dask
+pyarrow
+SPARQLWrapper
+scipy
