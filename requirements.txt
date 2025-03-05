@@ -7,3 +7,5 @@ dask
 pyarrow
 SPARQLWrapper
 scipy
+openai
+dotenv
