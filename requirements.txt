@@ -9,3 +9,4 @@ SPARQLWrapper
 scipy
 openai
 dotenv
+tiktoken

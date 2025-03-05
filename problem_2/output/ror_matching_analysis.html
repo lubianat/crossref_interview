@@ -1,22 +1,106 @@
 
-    <h2>Decision Tree for ROR Matching</h2>
-    <p>Matching is done in the following order:</p>
+    <h2>Decision Pipeline for ROR Matching</h2>
+    <p>Matching is done in the following order (normalizing names):</p>
     <ol>
-        <li>Exact match with ROR display name</li>
-        <li>Exact match with ROR label</li>
-        <li>Exact match with ROR alias</li>
-        <li>Exact match with ROR acronym</li>
-        <li>Comma-separated subpart match with ROR label</li>
-        <li>Comma-separated subpart match with ROR alias</li>
-        <li>Comma-separated subpart match with ROR acronym</li>
-        <li>Space-separated supart match with ROR label </li>
-        <li>Space-separated supart match with ROR alias </li>
-        <li>Space-separated supart match with ROR acronym </li>
-        <li>Exact match with Wikidata label</li>
-        <li>Comma-separated subpart match with Wikidata label</li>
-    </ol>
+        <li>Try and match the provided name to the ROR display name, labels, aliases and acronyms (aka "ROR strings").</li>
+        <li>If not, check if one of ROR strings is a substring of the provided name (comma-separated, space separated or just substring). <li>
+        <li>If not, check if provided name is a substring of the ROR strings </li>
+        <li>If not, check if the provided name is a substring of Wikidata labels/aliases</li>
+        <li>If not, check if the provided name is retrieved by the ROR affiliation matching API (any position)</li>
+        <li>If not, check if the provided name-ROR pair matches the manual medical school mappings</li>
+        <li>If not, check if the ROR status is "withdrawn"</li>
+        <li>If not, check if the provided name is retrieved by the Marple service (single-search)</li>
+        <li>If not, check if DeepSeekV3 considers it a match</li>
+
+           </ol>
     
-<h2>Match Summary</h2>
+<h2>Match Summary (grouped)</h2>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>category</th>
+      <th>count</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ror_display</td>
+      <td>56070</td>
+    </tr>
+    <tr>
+      <td>label</td>
+      <td>23005</td>
+    </tr>
+    <tr>
+      <td>ROR API match</td>
+      <td>2521</td>
+    </tr>
+    <tr>
+      <td>Wikidata match</td>
+      <td>2488</td>
+    </tr>
+    <tr>
+      <td>acronym</td>
+      <td>2104</td>
+    </tr>
+    <tr>
+      <td>no match (special case, Wageningen University)</td>
+      <td>1862</td>
+    </tr>
+    <tr>
+      <td>alias</td>
+      <td>1765</td>
+    </tr>
+    <tr>
+      <td>deepseek-v3 match</td>
+      <td>396</td>
+    </tr>
+    <tr>
+      <td>no match</td>
+      <td>377</td>
+    </tr>
+    <tr>
+      <td>medical school mapping</td>
+      <td>283</td>
+    </tr>
+    <tr>
+      <td>no match (special case, Witten/Herdecke University)</td>
+      <td>40</td>
+    </tr>
+    <tr>
+      <td>withdrawn ROR</td>
+      <td>28</td>
+    </tr>
+    <tr>
+      <td>no match (special case, Dana-Farber/Harvard Cancer Center)</td>
+      <td>11</td>
+    </tr>
+    <tr>
+      <td>Marple match</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <td>ror not registered</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+<h2>Unique Strings per Category</h2>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>category</th>
+      <th>unique_strings</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>no match</td>
+      <td>157</td>
+    </tr>
+  </tbody>
+</table>
+<h2>Match Summary (complete)</h2>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -35,15 +119,11 @@
     </tr>
     <tr>
       <td>ror_display as substring</td>
-      <td>4818</td>
+      <td>7190</td>
     </tr>
     <tr>
       <td>comma-separated subpart wikidata match</td>
-      <td>4237</td>
-    </tr>
-    <tr>
-      <td>wikidata</td>
-      <td>1981</td>
+      <td>1987</td>
     </tr>
     <tr>
       <td>no match (special case, Wageningen University)</td>
@@ -55,11 +135,11 @@
     </tr>
     <tr>
       <td>ror affiliation endpoint match position 1 (COMMON TERMS)</td>
-      <td>1138</td>
+      <td>1006</td>
     </tr>
     <tr>
-      <td>no match</td>
-      <td>1006</td>
+      <td>name as substring of ror_display</td>
+      <td>773</td>
     </tr>
     <tr>
       <td>inner parenthesis acronym match</td>
@@ -70,8 +150,28 @@
       <td>631</td>
     </tr>
     <tr>
+      <td>alias as substring</td>
+      <td>607</td>
+    </tr>
+    <tr>
       <td>comma-separated subpart alias match</td>
       <td>504</td>
+    </tr>
+    <tr>
+      <td>wikidata</td>
+      <td>501</td>
+    </tr>
+    <tr>
+      <td>deepseek-v3 match</td>
+      <td>396</td>
+    </tr>
+    <tr>
+      <td>no match</td>
+      <td>377</td>
+    </tr>
+    <tr>
+      <td>acronym as substring</td>
+      <td>325</td>
     </tr>
     <tr>
       <td>comma-separated subpart acronym match</td>
@@ -83,15 +183,15 @@
     </tr>
     <tr>
       <td>ror affiliation endpoint match position 2 (COMMON TERMS)</td>
-      <td>266</td>
-    </tr>
-    <tr>
-      <td>name as substring of ror_display</td>
-      <td>227</td>
+      <td>239</td>
     </tr>
     <tr>
       <td>medical school to university mapping (substring)</td>
       <td>223</td>
+    </tr>
+    <tr>
+      <td>name as substring of alias</td>
+      <td>218</td>
     </tr>
     <tr>
       <td>acronym</td>
@@ -99,15 +199,11 @@
     </tr>
     <tr>
       <td>ror affiliation endpoint match position 1 (PHRASE)</td>
-      <td>184</td>
+      <td>165</td>
     </tr>
     <tr>
-      <td>alias as substring</td>
-      <td>151</td>
-    </tr>
-    <tr>
-      <td>ror affiliation endpoint match position 3 (COMMON TERMS)</td>
-      <td>142</td>
+      <td>label as substring</td>
+      <td>149</td>
     </tr>
     <tr>
       <td>before parenthesis label match</td>
@@ -118,12 +214,16 @@
       <td>123</td>
     </tr>
     <tr>
-      <td>label as substring</td>
-      <td>119</td>
+      <td>ror affiliation endpoint match position 3 (COMMON TERMS)</td>
+      <td>122</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 1 (HEURISTICS)</td>
+      <td>89</td>
     </tr>
     <tr>
       <td>ror affiliation endpoint match position 4 (COMMON TERMS)</td>
-      <td>84</td>
+      <td>74</td>
     </tr>
     <tr>
       <td>ror affiliation endpoint match position 1 (EXACT)</td>
@@ -131,39 +231,47 @@
     </tr>
     <tr>
       <td>ror affiliation endpoint match position 2 (PHRASE)</td>
-      <td>69</td>
+      <td>70</td>
     </tr>
     <tr>
       <td>medical school to university mapping</td>
       <td>60</td>
     </tr>
     <tr>
-      <td>ror affiliation endpoint match position 9 (COMMON TERMS)</td>
-      <td>58</td>
-    </tr>
-    <tr>
       <td>ror affiliation endpoint match position 3 (PHRASE)</td>
-      <td>58</td>
+      <td>53</td>
     </tr>
     <tr>
-      <td>ror affiliation endpoint match position 5 (COMMON TERMS)</td>
-      <td>52</td>
-    </tr>
-    <tr>
-      <td>ror affiliation endpoint match position 1 (FUZZY)</td>
+      <td>ror affiliation endpoint match position 9 (COMMON TERMS)</td>
       <td>50</td>
     </tr>
     <tr>
-      <td>ror affiliation endpoint match position 4 (PHRASE)</td>
-      <td>35</td>
+      <td>ror affiliation endpoint match position 2 (HEURISTICS)</td>
+      <td>46</td>
+    </tr>
+    <tr>
+      <td>name as substring of label</td>
+      <td>45</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 5 (COMMON TERMS)</td>
+      <td>44</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 1 (FUZZY)</td>
+      <td>44</td>
     </tr>
     <tr>
       <td>ror affiliation endpoint match position 6 (COMMON TERMS)</td>
-      <td>34</td>
+      <td>43</td>
     </tr>
     <tr>
-      <td>ror affiliation endpoint match position 2 (FUZZY)</td>
-      <td>31</td>
+      <td>no match (special case, Witten/Herdecke University)</td>
+      <td>40</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 4 (PHRASE)</td>
+      <td>33</td>
     </tr>
     <tr>
       <td>inner parenthesis alias match</td>
@@ -175,10 +283,10 @@
     </tr>
     <tr>
       <td>ror affiliation endpoint match position 7 (COMMON TERMS)</td>
-      <td>30</td>
+      <td>28</td>
     </tr>
     <tr>
-      <td>ror affiliation endpoint match position 8 (COMMON TERMS)</td>
+      <td>ror affiliation endpoint match position 10 (COMMON TERMS)</td>
       <td>28</td>
     </tr>
     <tr>
@@ -186,71 +294,79 @@
       <td>28</td>
     </tr>
     <tr>
-      <td>name as substring of alias</td>
+      <td>ror affiliation endpoint match position 2 (FUZZY)</td>
+      <td>27</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 3 (HEURISTICS)</td>
       <td>25</td>
     </tr>
     <tr>
-      <td>ror affiliation endpoint match position 11 (COMMON TERMS)</td>
-      <td>23</td>
-    </tr>
-    <tr>
-      <td>ror affiliation endpoint match position 10 (COMMON TERMS)</td>
-      <td>23</td>
-    </tr>
-    <tr>
-      <td>ror affiliation endpoint match position 5 (PHRASE)</td>
-      <td>22</td>
+      <td>ror affiliation endpoint match position 8 (COMMON TERMS)</td>
+      <td>21</td>
     </tr>
     <tr>
       <td>inner parenthesis label match</td>
       <td>21</td>
     </tr>
     <tr>
-      <td>ror affiliation endpoint match position 12 (COMMON TERMS)</td>
-      <td>17</td>
+      <td>ror affiliation endpoint match position 5 (PHRASE)</td>
+      <td>20</td>
     </tr>
     <tr>
-      <td>name as substring of label</td>
+      <td>ror affiliation endpoint match position 11 (COMMON TERMS)</td>
+      <td>19</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 8 (HEURISTICS)</td>
       <td>15</td>
     </tr>
     <tr>
-      <td>ror affiliation endpoint match position 13 (COMMON TERMS)</td>
+      <td>ror affiliation endpoint match position 12 (COMMON TERMS)</td>
+      <td>13</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 17 (COMMON TERMS)</td>
       <td>12</td>
     </tr>
     <tr>
       <td>ror affiliation endpoint match position 3 (FUZZY)</td>
-      <td>10</td>
+      <td>12</td>
     </tr>
     <tr>
-      <td>ror affiliation endpoint match position 16 (COMMON TERMS)</td>
-      <td>10</td>
+      <td>no match (special case, Dana-Farber/Harvard Cancer Center)</td>
+      <td>11</td>
     </tr>
     <tr>
-      <td>ror affiliation endpoint match position 17 (COMMON TERMS)</td>
-      <td>10</td>
+      <td>ror affiliation endpoint match position 1 (ACRONYM)</td>
+      <td>11</td>
     </tr>
     <tr>
-      <td>ror affiliation endpoint match position 7 (PHRASE)</td>
-      <td>9</td>
-    </tr>
-    <tr>
-      <td>ror affiliation endpoint match position 5 (FUZZY)</td>
+      <td>ror affiliation endpoint match position 4 (HEURISTICS)</td>
       <td>8</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 7 (HEURISTICS)</td>
+      <td>7</td>
     </tr>
     <tr>
       <td>ror affiliation endpoint match position 14 (COMMON TERMS)</td>
-      <td>8</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <td>marple single-search match position 1</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 5 (FUZZY)</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 7 (PHRASE)</td>
+      <td>7</td>
     </tr>
     <tr>
       <td>ror affiliation endpoint match position 4 (FUZZY)</td>
-      <td>6</td>
-    </tr>
-    <tr>
-      <td>ror affiliation endpoint match position 20 (COMMON TERMS)</td>
-      <td>6</td>
-    </tr>
-    <tr>
-      <td>ror affiliation endpoint match position 18 (COMMON TERMS)</td>
       <td>6</td>
     </tr>
     <tr>
@@ -258,11 +374,19 @@
       <td>6</td>
     </tr>
     <tr>
-      <td>ror affiliation endpoint match position 9 (PHRASE)</td>
+      <td>ror affiliation endpoint match position 25 (COMMON TERMS)</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 6 (HEURISTICS)</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 6 (PHRASE)</td>
       <td>5</td>
     </tr>
     <tr>
-      <td>ror affiliation endpoint match position 15 (COMMON TERMS)</td>
+      <td>ror affiliation endpoint match position 9 (HEURISTICS)</td>
       <td>5</td>
     </tr>
     <tr>
@@ -274,19 +398,31 @@
       <td>4</td>
     </tr>
     <tr>
-      <td>ror affiliation endpoint match position 25 (COMMON TERMS)</td>
+      <td>ror affiliation endpoint match position 13 (COMMON TERMS)</td>
       <td>4</td>
     </tr>
     <tr>
-      <td>ror affiliation endpoint match position 22 (COMMON TERMS)</td>
+      <td>ror affiliation endpoint match position 18 (COMMON TERMS)</td>
       <td>4</td>
     </tr>
     <tr>
-      <td>ror affiliation endpoint match position 26 (COMMON TERMS)</td>
+      <td>ror affiliation endpoint match position 2 (ACRONYM)</td>
       <td>4</td>
     </tr>
     <tr>
-      <td>ror affiliation endpoint match position 10 (PHRASE)</td>
+      <td>ror affiliation endpoint match position 5 (HEURISTICS)</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 24 (COMMON TERMS)</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 20 (COMMON TERMS)</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 4 (ACRONYM)</td>
       <td>3</td>
     </tr>
     <tr>
@@ -294,11 +430,7 @@
       <td>3</td>
     </tr>
     <tr>
-      <td>ror affiliation endpoint match position 6 (PHRASE)</td>
-      <td>3</td>
-    </tr>
-    <tr>
-      <td>ror affiliation endpoint match position 11 (PHRASE)</td>
+      <td>ror affiliation endpoint match position 9 (PHRASE)</td>
       <td>3</td>
     </tr>
     <tr>
@@ -306,35 +438,7 @@
       <td>2</td>
     </tr>
     <tr>
-      <td>ror affiliation endpoint match position 31 (COMMON TERMS)</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <td>ror affiliation endpoint match position 13 (PHRASE)</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <td>ror affiliation endpoint match position 43 (COMMON TERMS)</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <td>ror affiliation endpoint match position 11 (FUZZY)</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <td>ror affiliation endpoint match position 28 (PHRASE)</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <td>ror affiliation endpoint match position 7 (FUZZY)</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <td>ror affiliation endpoint match position 15 (FUZZY)</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <td>ror affiliation endpoint match position 29 (COMMON TERMS)</td>
+      <td>ror affiliation endpoint match position 15 (HEURISTICS)</td>
       <td>2</td>
     </tr>
     <tr>
@@ -342,7 +446,39 @@
       <td>2</td>
     </tr>
     <tr>
-      <td>ror affiliation endpoint match position 15 (PHRASE)</td>
+      <td>ror affiliation endpoint match position 23 (COMMON TERMS)</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 24 (PHRASE)</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 5 (ACRONYM)</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 15 (COMMON TERMS)</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 10 (PHRASE)</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 44 (COMMON TERMS)</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 28 (PHRASE)</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 16 (COMMON TERMS)</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 11 (PHRASE)</td>
       <td>2</td>
     </tr>
     <tr>
@@ -350,7 +486,27 @@
       <td>2</td>
     </tr>
     <tr>
-      <td>ror affiliation endpoint match position 28 (COMMON TERMS)</td>
+      <td>ror affiliation endpoint match position 11 (FUZZY)</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 16 (FUZZY)</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 13 (PHRASE)</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 7 (FUZZY)</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 22 (COMMON TERMS)</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>ror affiliation endpoint match position 3 (ACRONYM)</td>
       <td>1</td>
     </tr>
     <tr>
@@ -365,7 +521,6 @@
     <tr style="text-align: right;">
       <th>ROR_ID</th>
       <th>no_match_count</th>
-      <th>id</th>
       <th>names.types.ror_display</th>
       <th>unique_names</th>
       <th>prefix_counts</th>
@@ -375,2761 +530,855 @@
     <tr>
       <td>https://ror.org/01bj3aw27</td>
       <td>92</td>
-      <td>https://ror.org/01bj3aw27</td>
       <td>United States Department of Energy</td>
-      <td>[shobhit institue of engineering and techenology]</td>
+      <td>shobhit institue of engineering and techenology</td>
       <td>{'10.59875': 92}</td>
     </tr>
     <tr>
       <td>https://ror.org/00mkhxb43</td>
       <td>48</td>
-      <td>https://ror.org/00mkhxb43</td>
       <td>University of Notre Dame</td>
-      <td>[university of north carolina at chapel hill]</td>
+      <td>university of north carolina at chapel hill</td>
       <td>{'10.31219': 5, '10.31229': 1, '10.31234': 38, '10.31235': 3, '10.35542': 1}</td>
     </tr>
     <tr>
-      <td>https://ror.org/00yq55g44</td>
-      <td>40</td>
-      <td>https://ror.org/00yq55g44</td>
-      <td>Witten/Herdecke University</td>
-      <td>[griffith university / university of queensland, patient safety translational research centre, imperial college london, uk; centre for health technology and services research/department of community medicine, information and decision in health, university of porto, portugal, vanderbilt institute for global health (vigh), vanderbilt university medical center (vumc), nashville, tn; department of health policy, vanderbilt university medical center (vumc), nashville, tn; mrc/wits rural public health and health transitions research unit (agincourt) school of public health, faculty of health sciences, university of the witwatersrand, johannesburg, south africa, university of edinburgh/oslo university college, norway, department of energy, politecnico di milano; centre de recherche sur les risques et les crises, mines paristech/psl universite paris, department of physical medicine and rehabilitation, new york-presbyterian (columbia/cornell), new york, ny, food and veterinary institute braunschweig/hannover, lower saxony state office for consumer protection and food safety (laves), hannover, germany, resilience innovation knowledge academy (rika) india pvt. ltd. / kyoto university, resilience innovation knowledge academy (rika) india pvt. ltd. / keio university, japan, the department of gynecologic oncology and reproductive medicine - the university of texas md anderson cancer center, houston, texas, usa; the obstetrics and gynecology department, federal university of health sciences of porto alegre/irmandade santa casa de misericordia de porto alegre, brazil, universite laval/laval university, canada, universite gustave eiffel, ecole des ingenieurs de la ville de paris / universite de lorraine, cnrs, cregu, georessources, epidemiology, department for sport and health sciences, technical university of munich, munich, germany; partners in health/inshuti mu buzima, kigali, rwanda, department of medicine, division of hematology/oncology, university of california san francisco, san francisco, ca, usa; department of epidemiology and biostatistics, university of california san francisco, san francisco, ca, usa, spectrum health/michigan state university college of human medicine, medicinal chemistry, hi-tech agriculture and bioactive compounds research group, school of engineering and technology, van lang university, 69/68 dang thuy tram street, ward 13, binh thanh district, ho chi minh city, 70000 vietnam, medicinal chemistry, hi-tech agriculture and bioactive compounds research group, school of engineering and technology, van lang university, 69/68 dang thuy tram street, ward 13, binh thanh district, ho chi minh city 70000, vietnam, universidad de san andres/conicet, argentina, victorian college of the arts/melbourne university, southern marine science and engineering guangdong laboratory (zhuhai)/ school of marine sciences, sun yat-sen university, guangzhou, pr china, genesys regional medical center/ascension health pgy-1 internal medicine resident, grand blanc, mi, graduate school of sciences and technology for innovation, yamaguchi university /department of civil engineering, faculty of civil engineering and planning, islamic university of indonesia, national institute of science and technology for health technology assessment (iats) - cnpq/brazil (project: 465518/2014-1), porto alegre, rs, brazil; school of technology, pontificia universidade catolica do rio grande do sul, porto alegre, brazil; postgraduate program in epidemiology, universidade federal do rio grande do sul, porto alegre, brazil, national institute of science and technology for health technology assessment (iats) - cnpq/brazil (project: 465518/2014-1), porto alegre, rs, brazil; postgraduate program in epidemiology, universidade federal do rio grande do sul, porto alegre, brazil, university of new south wales / university of canberra, division of hematology/oncology, department of medicine, university of california, san francisco, san francisco, ca, usa; helen diller family comprehensive cancer center, san francisco, ca, usa, university of ludwigshafen / weincampus neustadt, queensland university of technology / text, izmir/bornova veterinary control institute, deparment of virology, national reference laboratory of fish diseases, izmir, turkey, esic university / esic business and marketing school, universidade lusofona/trie; iscte-iul, new york-presbyterian (columbia/cornell), south china sea fisheries research institute, chinese academy of fishery sciences/key lab. of south china sea fishery resources exploitation and utilization, ministry of agriculture and rural affairs, guangzhou, 510300, p.r. china; tropical fishery research and development center, south china sea fisheries research institute, chinese academy of fishery sciences, sanya 572018, p.r. china, south china sea fisheries research institute, chinese academy of fishery sciences/key lab. of south china sea fishery resources exploitation and utilization, ministry of agriculture and rural affairs, guangzhou, 510300, p.r. china, south china sea fisheries research institute, chinese academy of fishery sciences/key lab. of south china sea fishery resources exploitation and utilization, ministry of agriculture and rural affairs, guangzhou, 510300, p.r. china;, medicinal chemistry, hi-tech agriculture and bioactive compounds research group, school of engineering and technology, van lang university, 69/68 dang thuy tram street, ward 13, binh thanh district, ho chi minh city, 70000 viet nam, wintec / waikato institute of technology, new zealand, research and training, partners in health/inshuti mu buzima (pih/imb); department of global health and social medicine, harvard medical school, partners in health/inshuti mu buzima (pih/imb); department of global health, university of washington, trinity college of the university of melbourne / australian catholic university]</td>
-      <td>{'10.26813': 1, '10.29392': 5, '10.32866': 1, '10.36469': 1, '10.46697': 2, '10.46989': 5, '10.48045': 2, '10.51894': 2, '10.52086': 6, '10.52399': 1, '10.52965': 2, '10.53703': 2, '10.53876': 2, '10.5595': 3}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/02etsyv71</td>
-      <td>27</td>
-      <td>https://ror.org/02etsyv71</td>
-      <td>Russian Economic University after G.V. Plekhanov</td>
-      <td>[fsbei of he andquot;plekhanov russian university of economicsandquot;]</td>
-      <td>{'10.31483': 27}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/02feahw73</td>
-      <td>18</td>
-      <td>https://ror.org/02feahw73</td>
-      <td>Centre National de la Recherche Scientifique</td>
-      <td>[station de primatologie cnrs-celphedia, cnrs-mnhn-universite paris cite, genomics core facility, institut imagine-structure federative de recherche necker, inserm u1163, inserm us24/cnrs ums3633, paris descartes sorbonne paris cite university, fraib-cnrs plateforme imagerie, umr7206 eco-anthropologie, cnrs-mnhn-universite paris cite, unite de service et de recherche usr 3388, cnrs-pierre fabre, epigenetic targeting of cancer (etac), cnrs-aix marseille university, human genetics and cognitive functions, institut pasteur, umr3571 cnrs, universite paris cite, laas-cnrs, cnrs/universite paris descartes]</td>
-      <td>{'10.7554': 18}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/02gfc7t72</td>
-      <td>13</td>
-      <td>https://ror.org/02gfc7t72</td>
-      <td>Consejo Superior de Investigaciones Científicas</td>
-      <td>[csic-uam, institute of marine sciences, icm‐csic, centro de biologia molecular severo ochoa (csic/uam), campus de cantoblanco, nicolas cabrera, centro de biologia molecular severo ochoa, csic-uam, cantoblanco, departament de neurociencies i terapeutica experimental, csic-institut d'investigacions biomediques de barcelona]</td>
-      <td>{'10.7554': 13}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/042nb2s44</td>
-      <td>11</td>
-      <td>https://ror.org/042nb2s44</td>
-      <td>Massachusetts Institute of Technology</td>
-      <td>[whitehead institute/mit, ludwig center at mit's koch institute for integrative cancer research, department of medicine, division of infectious diseases, massachusetts general hospital]</td>
-      <td>{'10.7554': 11}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/03pvyf116</td>
-      <td>11</td>
-      <td>https://ror.org/03pvyf116</td>
-      <td>Dana-Farber/Harvard Cancer Center</td>
-      <td>[ars/usda, al-salt college for social science/ al-balqa applied university, clinical instructor/emergency medicine resident, mclaren oakland, pontiac, mi, college of aquaculture and fisheries, can tho university, 3/2 street, ninh kieu district, can tho city 94000, vietnam, assoc. prof. dr., borsa istanbul financial reporting and subsidiaries directorate, istanbul/turkey., cork university dental school and hospital / ucc, born ontario/obstetrics and maternal newborn investigations, ottawa, ontario, canada, core faculty and attending physician infectious diseases/internal medicine, lakeland regional medical center, saint joseph, mi, centre for digital humanities (gcdh) / gottingen state and university library, college of aquaculture and fisheries, can tho university, 3/2 street, ninh kieu district, can tho city 94000, viet nam, aquaculture department, southeast asian fisheries development center (seafdec/aqd), iloilo, philippines]</td>
-      <td>{'10.22148': 1, '10.29392': 1, '10.46557': 1, '10.46989': 2, '10.48045': 1, '10.51894': 2, '10.52965': 1, '10.56179': 1, '10.58541': 1}</td>
-    </tr>
-    <tr>
       <td>https://ror.org/05ww3wq27</td>
       <td>11</td>
-      <td>https://ror.org/05ww3wq27</td>
       <td>HEC Montréal</td>
-      <td>[ludmer centre for neuroinformatics and mental health, the douglas research center, mcgill centre for studies in aging, mcgill centre for microbiome research, genome quebec innovation centre, quebec centre for biodiversity science]</td>
+      <td>ludmer centre for neuroinformatics and mental health | the douglas research center | mcgill centre for studies in aging | mcgill centre for microbiome research | genome quebec innovation centre | quebec centre for biodiversity science</td>
       <td>{'10.7554': 7}</td>
     </tr>
     <tr>
-      <td>https://ror.org/01tgyzw49</td>
-      <td>10</td>
-      <td>https://ror.org/01tgyzw49</td>
-      <td>National University of Singapore</td>
-      <td>[yale-nus college, ophthalmology and visual sciences academic clinical program, duke-nus medical school, centre for computational biology, duke-nus medical school, programme in cardiovascular and metabolic disorders, duke-nus medical school, division of science, yale-nus college]</td>
-      <td>{'10.7554': 8}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/036yvre49</td>
-      <td>10</td>
-      <td>https://ror.org/036yvre49</td>
-      <td>Kemerovo State University</td>
-      <td>[fgbou vo andquot;kemerovskii gosudarstvennyi universitetandquot;]</td>
-      <td>{'10.31483': 10}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/04374qe70</td>
-      <td>9</td>
-      <td>https://ror.org/04374qe70</td>
-      <td>SickKids Foundation</td>
-      <td>[neuroscience and mental health, hospital for sick children research institute, division of neurosurgery, the hospital for sick children, cell biology program, the hospital for sick children, the hospital for sick children, molecular medicine program, the hospital for sick children]</td>
-      <td>{'10.7554': 7}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/03kpps236</td>
-      <td>9</td>
-      <td>https://ror.org/03kpps236</td>
-      <td>Barcelona Institute for Science and Technology</td>
-      <td>[centro nacional de analisis genomico (cnag-crg), center for genomic regulation, barcelona institute of science and technology (bist), icfo-institut de ciencies fotoniques, the barcelona institute of science and technology, centre for genomic regulation (crg), the barcelona institute of science and technology (bist), the barcelona institute of science and technology]</td>
-      <td>{'10.7554': 9}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/00j0x9b96</td>
-      <td>8</td>
-      <td>https://ror.org/00j0x9b96</td>
-      <td>Ulyanovsk State Pedagogical University Named After I. Ulyanov</td>
-      <td>[fsbei of he andquot;ulyanovsk state university of educationandquot;]</td>
-      <td>{'10.31483': 8}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/00za53h95</td>
-      <td>8</td>
-      <td>https://ror.org/00za53h95</td>
-      <td>Johns Hopkins University</td>
-      <td>[department of biomedical engineering, johns hopkins school of medicine and whiting school of engineering, department of physical medicine and rehabilitation, johns hopkins bloomberg school of public health]</td>
-      <td>{'10.7554': 8}</td>
-    </tr>
-    <tr>
       <td>https://ror.org/02vjkv261</td>
-      <td>8</td>
-      <td>https://ror.org/02vjkv261</td>
+      <td>7</td>
       <td>Inserm</td>
-      <td>[centre de reference des maladies autoinflammatoires et des amyloses inflammatoires, ceremaia 6 , france, 3 , paris, france, university of california, davis 1 biophysics graduate group, , davis, ca, usa, university of california, davis 2 department of physiology and membrane biology, , davis, ca, usa, university of california, davis 3 department of chemical engineering, , davis, ca, usa, university of california, davis 4 department of pharmacology, , davis, ca, usa, university of california, davis 5 center for precision medicine and data science, , davis, ca, usa, university of california, davis 6 department of anesthesiology and pain medicine, , davis, ca, usa]</td>
-      <td>{'10.1084': 2, '10.1085': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/001z21q04</td>
-      <td>7</td>
-      <td>https://ror.org/001z21q04</td>
-      <td>Sorbonne Paris Cité</td>
-      <td>[centre de recherche des cordeliers, inserm, sorbonne universite, universite paris cite., department of integrative biology and physiology, field systems biology, sciences sorbonne universite, universite sorbonne paris nord, universite paris cite and sorbonne paris nord, inserm, iame]</td>
-      <td>{'10.26508': 1, '10.7554': 6}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/04r1cxt79</td>
-      <td>7</td>
-      <td>https://ror.org/04r1cxt79</td>
-      <td>Kenya Medical Research Institute</td>
-      <td>[kemri/ wellcome trust research programme, centre for geographic medicine research (coast), kemri-wellcome trust research programme, kemri-wellcome trust research programme, kemri-wellcome trust research programme, centre for geographic medicine research-coast]</td>
-      <td>{'10.7554': 7}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/021wm7p51</td>
-      <td>7</td>
-      <td>https://ror.org/021wm7p51</td>
-      <td>Council of Scientific and Industrial Research</td>
-      <td>[csir-institute of genomics and integrative biology, csir-central drug research institute, csir–centre for cellular and molecular biology]</td>
-      <td>{'10.7554': 7}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/02v51f717</td>
-      <td>6</td>
-      <td>https://ror.org/02v51f717</td>
-      <td>Peking University</td>
-      <td>[pku-idg/mcgovern institute for brain research, pku-nanjing institute of translational medicine, nanjing raygen health]</td>
-      <td>{'10.7554': 6}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/049mpkx27</td>
-      <td>6</td>
-      <td>https://ror.org/049mpkx27</td>
-      <td>Shriners Hospitals for Children - St. Louis</td>
-      <td>[shriners hospital for children]</td>
-      <td>{'10.7554': 6}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/00zbnzw74</td>
-      <td>6</td>
-      <td>https://ror.org/00zbnzw74</td>
-      <td>Stratford University</td>
-      <td>[sarafan chem-h, stanford university, department of electrical engineering, stanford university, woods institute for the environment, stanford university]</td>
-      <td>{'10.7554': 4}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/032e6b942</td>
-      <td>6</td>
-      <td>https://ror.org/032e6b942</td>
-      <td>Alfred-Wegener-Institut Helmholtz-Zentrum für Polar- und Meeresforschung</td>
-      <td>[alfred wegener institute helmholtz centre for polar and marine research, alfred wegener institute, helmholtz centre for polar and marine research, alfred wegener institute, alfred wegener institute helmholtz centre for polar and marine research, polar terrestrial environmental systems]</td>
-      <td>{'10.7554': 6}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/03cqe8w59</td>
-      <td>6</td>
-      <td>https://ror.org/03cqe8w59</td>
-      <td>Consejo Nacional de Investigaciones Científicas y Técnicas</td>
-      <td>[biology and experimental medicine institute, ibyme-conicet, institute of nuclear technologies for health, intecnus-conicet, instituto de investigacion en biomedicina de buenos aires (ibioba) – conicet/partner institute of the max planck society, polo cientifico tecnologico]</td>
-      <td>{'10.7554': 4}</td>
+      <td>3 , paris, france | university of california, davis 1 biophysics graduate group, , davis, ca, usa | university of california, davis 2 department of physiology and membrane biology, , davis, ca, usa | university of california, davis 3 department of chemical engineering, , davis, ca, usa | university of california, davis 4 department of pharmacology, , davis, ca, usa | university of california, davis 5 center for precision medicine and data science, , davis, ca, usa | university of california, davis 6 department of anesthesiology and pain medicine, , davis, ca, usa</td>
+      <td>{'10.1084': 1, '10.1085': 1}</td>
     </tr>
     <tr>
       <td>https://ror.org/032h4fk17</td>
       <td>6</td>
-      <td>https://ror.org/032h4fk17</td>
       <td>San Francisco Zoo</td>
-      <td>[helen diller family comprehensive cancer center, kavli institute for fundamental neuroscience, chan zuckerberg biohub]</td>
+      <td>helen diller family comprehensive cancer center | kavli institute for fundamental neuroscience | chan zuckerberg biohub</td>
       <td>{'10.7554': 6}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00zbnzw74</td>
+      <td>6</td>
+      <td>Stratford University</td>
+      <td>sarafan chem-h, stanford university | department of electrical engineering, stanford university | woods institute for the environment, stanford university</td>
+      <td>{'10.7554': 4}</td>
     </tr>
     <tr>
       <td>https://ror.org/01k9v9b21</td>
       <td>6</td>
-      <td>https://ror.org/01k9v9b21</td>
       <td>Indianapolis Zoo</td>
-      <td>[department of biochemistry and molecular biology, indiana university school of medicine, department of medical and molecular genetics, indiana university school of medicine, department of pathology and laboratory medicine, indiana university school of medicine]</td>
+      <td>department of biochemistry and molecular biology, indiana university school of medicine | department of medical and molecular genetics, indiana university school of medicine | department of pathology and laboratory medicine, indiana university school of medicine</td>
       <td>{'10.7554': 2}</td>
     </tr>
     <tr>
-      <td>https://ror.org/00tw3jy02</td>
+      <td>https://ror.org/04374qe70</td>
       <td>5</td>
-      <td>https://ror.org/00tw3jy02</td>
-      <td>MRC Laboratory of Molecular Biology</td>
-      <td>[mrc-lmb, francis crick avenue, medical research council laboratory of molecular biology 1 division of structural studies, , cambridge, uk, mrc-lmb, medical research council laboratory of molecular biology 1 cell biology division, , cambridge, uk]</td>
-      <td>{'10.1083': 2, '10.7554': 3}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/00q16t150</td>
-      <td>5</td>
-      <td>https://ror.org/00q16t150</td>
-      <td>University of Texas Health Science Center at Dallas</td>
-      <td>[department of anesthesiology, university of texas health sciences center, department of pharmacology, university of texas southwestern medical center, university of texas southwestern medical center]</td>
+      <td>SickKids Foundation</td>
+      <td>neuroscience and mental health, hospital for sick children research institute | the hospital for sick children | molecular medicine program, the hospital for sick children</td>
       <td>{'10.7554': 5}</td>
     </tr>
     <tr>
-      <td>https://ror.org/021036w13</td>
-      <td>5</td>
-      <td>https://ror.org/021036w13</td>
-      <td>Belarusian State University</td>
-      <td>[belarus state university]</td>
-      <td>{'10.31483': 5}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/03jp40720</td>
-      <td>4</td>
-      <td>https://ror.org/03jp40720</td>
-      <td>Mayo Clinic in Arizona</td>
-      <td>[mayo clinic 1 department of neuroscience, , scottsdale, az, usa, mayo clinic graduate school of biomedical sciences, mayo clinic 2 neuroscience graduate program, , scottsdale, az, usa, mayo clinic graduate school of biomedical sciences, mayo clinic 3 biochemistry and molecular biology graduate program, , scottsdale, az, usa, mayo clinic 4 md/phd training program, , scottsdale, az, usa]</td>
-      <td>{'10.1084': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/02c4ez492</td>
-      <td>4</td>
-      <td>https://ror.org/02c4ez492</td>
-      <td>Hershey (United States)</td>
-      <td>[departments of pharmacology and biochemistry and molecular biology, institute for personalized medicine, pennsylvania state university college of medicine, 500 university drive, department of cellular and molecular physiology, penn state college of medicine]</td>
-      <td>{'10.7554': 4}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/046rm7j60</td>
-      <td>4</td>
-      <td>https://ror.org/046rm7j60</td>
-      <td>University of California, Los Angeles</td>
-      <td>[department of psychiatry and biobehavioral sciences, semel institute for neuroscience and human behavior]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/043cec594</td>
-      <td>4</td>
-      <td>https://ror.org/043cec594</td>
-      <td>AstraZeneca (United States)</td>
-      <td>[biologics engineering and targeted delivery, oncology randd, astrazeneca, bioscience metabolism, research and early development, cardiovascular, renal and metabolism (cvrm), biopharmaceuticals randd, astrazeneca]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/02jqc0m91</td>
-      <td>4</td>
-      <td>https://ror.org/02jqc0m91</td>
-      <td>Seattle University</td>
-      <td>[center for integrative brain research, seattle children's research institute, center for immunity and immunotherapies, seattle children's research institute]</td>
-      <td>{'10.7554': 4}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/043mz5j54</td>
-      <td>4</td>
-      <td>https://ror.org/043mz5j54</td>
-      <td>University of California, San Francisco</td>
-      <td>[division of biology and biological engineering, california institute of technology, gladstone-ucsf institute of genomic immunology]</td>
-      <td>{'10.7554': 4}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/038t36y30</td>
-      <td>4</td>
-      <td>https://ror.org/038t36y30</td>
-      <td>Heidelberg University</td>
-      <td>[heidelberg biosciences international graduate school, heidelberg biosciences international graduate school (hbigs)]</td>
-      <td>{'10.7554': 4}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/01xdqrp08</td>
-      <td>4</td>
-      <td>https://ror.org/01xdqrp08</td>
-      <td>Pfizer (United States)</td>
-      <td>[internal medicine research unit, pfizer worldwide research, development and medical, pfizer global randd]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/05a28rw58</td>
-      <td>4</td>
-      <td>https://ror.org/05a28rw58</td>
-      <td>ETH Zurich</td>
-      <td>[laboratory for movement biomechanics, institute for biomechanics, lab of systems neuroscience, institute for neuroscience, department of health science and technology, swiss federal institute of technology eth]</td>
-      <td>{'10.7554': 4}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/006a7pj43</td>
-      <td>4</td>
-      <td>https://ror.org/006a7pj43</td>
-      <td>Centre hospitalier universitaire de Québec</td>
-      <td>[glycobiology and bioimaging laboratory of research center for infectious diseases and research centre of chu de quebec, laboratory of dna damage responses and bioimaging, research centre of chu de quebec]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/03eqttr49</td>
-      <td>4</td>
-      <td>https://ror.org/03eqttr49</td>
-      <td>Research Triangle Park Foundation</td>
-      <td>[mechanistic toxicology branch, dntp, molecular genomics core, dir niehs]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/05tkyf982</td>
-      <td>4</td>
-      <td>https://ror.org/05tkyf982</td>
-      <td>Ben-Gurion University of the Negev</td>
-      <td>[department of physiology and cell biology, faculty of health sciences and zlotowski center for neuroscience, ben–gurion university of the negev, department of neurosurgery, faculty of health sciences and zlotowski center for neuroscience, ben–gurion university of the negev]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/00by1q217</td>
-      <td>4</td>
-      <td>https://ror.org/00by1q217</td>
-      <td>Roche (Switzerland)</td>
-      <td>[roche pharma research and early development, neuroscience and rare diseases, roche innovation center basel, f. hoffmann–la roche ltd., hoffman la-roche]</td>
-      <td>{'10.7554': 4}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/01zgy1s35</td>
-      <td>4</td>
-      <td>https://ror.org/01zgy1s35</td>
-      <td>University Medical Center Hamburg-Eppendorf</td>
-      <td>[department of cardiology, university heart and vascular center, university center of cardiovascular science, university heart and vascular center]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/01y2jtd41</td>
-      <td>4</td>
-      <td>https://ror.org/01y2jtd41</td>
-      <td>University of Wisconsin–Madison</td>
-      <td>[department of human oncology, university of wisconsin school of medicine and public health, division of hematology medical oncology and palliative care, department of medicine university of wisconsin]</td>
-      <td>{'10.7554': 4}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/00tdyb139</td>
-      <td>4</td>
-      <td>https://ror.org/00tdyb139</td>
-      <td>Carnegie Department of Plant Biology</td>
-      <td>[laboratory of systems pharmacology, department of systems biology, harvard program in therapeutic science, harvard medical school, department of systems biology, harvard medical schoo]</td>
-      <td>{'10.7554': 4}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/027vj4x92</td>
-      <td>4</td>
-      <td>https://ror.org/027vj4x92</td>
-      <td>Sanofi (United States)</td>
-      <td>[translational sciences, sanofi, sanofi oncology, sanofi 4 , cambridge, ma, usa, sanofi integrated drug discovery, sanofi 5 , cambridge, ma, usa]</td>
-      <td>{'10.1084': 1, '10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/01esghr10</td>
-      <td>4</td>
-      <td>https://ror.org/01esghr10</td>
-      <td>Columbia University Irving Medical Center</td>
-      <td>[columbia university 1 department of microbiology and immunology, , new york, ny, usa, columbia university vagelos college of physicians and surgeons 2 department of pediatrics, , new york, ny, usa, columbia stem cell initiative, department of genetics and development, columbia university 1 , new york, ny, usa, columbia university 1 department of physiology and cellular biophysics, , new york, ny, usa]</td>
-      <td>{'10.1084': 3, '10.1085': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/02ks8qq67</td>
-      <td>4</td>
-      <td>https://ror.org/02ks8qq67</td>
-      <td>Hungarian Academy of Sciences</td>
-      <td>[eotvos lorand research network (elkh), eotvos lorand kutatasi halozat, mta-szte]</td>
-      <td>{'10.14232': 4}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/04q84b570</td>
-      <td>4</td>
-      <td>https://ror.org/04q84b570</td>
-      <td>World Health Organization - Lyon Office</td>
-      <td>[genomic epidemiology branch, international agency for research on cancer/world health organization (iarc/who), international agency for research on cancer (iarc/who), early detection, prevention and infections branch]</td>
-      <td>{'10.7554': 4}</td>
-    </tr>
-    <tr>
       <td>https://ror.org/03egfjv78</td>
       <td>4</td>
-      <td>https://ror.org/03egfjv78</td>
       <td>France Parkinson</td>
-      <td>[departement adaptations du vivant, research federation for the study of global ocean systems ecology and evolution, fr2o22/tara gosee]</td>
+      <td>departement adaptations du vivant | research federation for the study of global ocean systems ecology and evolution, fr2o22/tara gosee</td>
       <td>{'10.7554': 4}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/03xswyc88</td>
-      <td>4</td>
-      <td>https://ror.org/03xswyc88</td>
-      <td>Reproductive Medicine Associates of New York</td>
-      <td>[department of pathology and laboratory medicine, weill cornell medicine, weill cornell/rockefeller/sloan-kettering tri-institutional md-phd program]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/004rtk039</td>
-      <td>4</td>
-      <td>https://ror.org/004rtk039</td>
-      <td>Japan Agency for Medical Research and Development</td>
-      <td>[amed-crest]</td>
-      <td>{'10.7554': 4}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/03ydkyb10</td>
-      <td>4</td>
-      <td>https://ror.org/03ydkyb10</td>
-      <td>University of Wisconsin System</td>
-      <td>[department of biochemistry, university of wisconsin-madison, department of communication sciences and disorders, university of wisconsin–madison]</td>
-      <td>{'10.7554': 4}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/05eqycp84</td>
-      <td>4</td>
-      <td>https://ror.org/05eqycp84</td>
-      <td>Cheng Ching Hospital</td>
-      <td>[department of oncology, shengjing hospital of china medical university, department of pediatrics, shengjing hospital of china medical university]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/025fyfd20</td>
-      <td>4</td>
-      <td>https://ror.org/025fyfd20</td>
-      <td>Children's Hospital of Zhejiang University</td>
-      <td>[institute of genetics, the children's hospital, zhejiang university school of medicine, children's hospital, zhejiang university school of medicine, national clinical research center for child health, national children's regional medical center]</td>
-      <td>{'10.7554': 4}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/00hx57361</td>
-      <td>4</td>
-      <td>https://ror.org/00hx57361</td>
-      <td>Princeton University</td>
-      <td>[princeton neuroscience institute, princeton neuroscience institute and the department of psychology]</td>
-      <td>{'10.7554': 4}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/01w6qp003</td>
-      <td>4</td>
-      <td>https://ror.org/01w6qp003</td>
-      <td>University of Veterinary Medicine Vienna</td>
-      <td>[institut fur populationsgenetik, vetmeduni vienna, vienna graduate school of population genetics, vetmeduni vienna]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/00d55g310</td>
-      <td>4</td>
-      <td>https://ror.org/00d55g310</td>
-      <td>Transbaikal State University</td>
-      <td>[fsbei of he andquot;zabaykalsky state universityandquot;]</td>
-      <td>{'10.31483': 4}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/04a7f6w43</td>
-      <td>4</td>
-      <td>https://ror.org/04a7f6w43</td>
-      <td>Max Planck Institute of Experimental Medicine</td>
-      <td>[electron microscopy core unit, max-planck-institute of experimental medicine, department of neurogenetics, max planck institute for multidisciplinary sciences]</td>
-      <td>{'10.7554': 4}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/05av6m066</td>
-      <td>4</td>
-      <td>https://ror.org/05av6m066</td>
-      <td>United States Marine Corps</td>
-      <td>[harvard medical school (hms) library of integrated network-based cellular signatures (lincs) center, zymo research corp]</td>
-      <td>{'10.7554': 4}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/020z26690</td>
-      <td>4</td>
-      <td>https://ror.org/020z26690</td>
-      <td>Moscow State Linguistic University</td>
-      <td>[fgbou vo andquot;moskovskii gosudarstvennyi lingvisticheskii universitetandquot;]</td>
-      <td>{'10.31483': 4}</td>
     </tr>
     <tr>
       <td>https://ror.org/05t45gr77</td>
       <td>4</td>
-      <td>https://ror.org/05t45gr77</td>
       <td>Wuhan Center for Disease Control and Prevention</td>
-      <td>[xihu district center for disease control and prevention, yuecheng district center for disease control and prevention]</td>
+      <td>xihu district center for disease control and prevention | yuecheng district center for disease control and prevention</td>
       <td>{'10.7554': 2}</td>
     </tr>
     <tr>
-      <td>https://ror.org/03gds6c39</td>
-      <td>3</td>
-      <td>https://ror.org/03gds6c39</td>
-      <td>The University of Texas Health Science Center at Houston</td>
-      <td>[institute of molecular medicine, university of texas health sciences center, graduate school of biological sciences, m.d. anderson cancer center and university of texas health science center 2 program of molecular and translational biology, , houston, tx, usa]</td>
-      <td>{'10.1083': 1, '10.7554': 2}</td>
+      <td>https://ror.org/00tdyb139</td>
+      <td>4</td>
+      <td>Carnegie Department of Plant Biology</td>
+      <td>laboratory of systems pharmacology, department of systems biology, harvard program in therapeutic science, harvard medical school | department of systems biology, harvard medical schoo</td>
+      <td>{'10.7554': 4}</td>
     </tr>
     <tr>
-      <td>https://ror.org/056d84691</td>
+      <td>https://ror.org/03eqttr49</td>
+      <td>4</td>
+      <td>Research Triangle Park Foundation</td>
+      <td>mechanistic toxicology branch, dntp | molecular genomics core, dir niehs</td>
+      <td>{'10.7554': 2}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05av6m066</td>
+      <td>4</td>
+      <td>United States Marine Corps</td>
+      <td>harvard medical school (hms) library of integrated network-based cellular signatures (lincs) center | zymo research corp</td>
+      <td>{'10.7554': 4}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02jqc0m91</td>
+      <td>4</td>
+      <td>Seattle University</td>
+      <td>center for integrative brain research, seattle children's research institute | center for immunity and immunotherapies, seattle children's research institute</td>
+      <td>{'10.7554': 4}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02c4ez492</td>
+      <td>4</td>
+      <td>Hershey (United States)</td>
+      <td>departments of pharmacology and biochemistry and molecular biology, institute for personalized medicine, pennsylvania state university college of medicine, 500 university drive | department of cellular and molecular physiology, penn state college of medicine</td>
+      <td>{'10.7554': 4}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03xswyc88</td>
+      <td>4</td>
+      <td>Reproductive Medicine Associates of New York</td>
+      <td>department of pathology and laboratory medicine, weill cornell medicine | weill cornell/rockefeller/sloan-kettering tri-institutional md-phd program</td>
+      <td>{'10.7554': 2}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05eqycp84</td>
+      <td>4</td>
+      <td>Cheng Ching Hospital</td>
+      <td>department of oncology, shengjing hospital of china medical university | department of pediatrics, shengjing hospital of china medical university</td>
+      <td>{'10.7554': 2}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00q16t150</td>
       <td>3</td>
-      <td>https://ror.org/056d84691</td>
-      <td>Karolinska Institutet</td>
-      <td>[karolinska institute 1 division of medical inflammation research, department of medical biochemistry and biophysics, , solna, sweden, karolinska institute 2 division of physiological chemistry i, department of medical biochemistry and biophysics, , solna, sweden, karolinska institute 2 department of cell and molecular biology, , stockholm, sweden]</td>
-      <td>{'10.1084': 2}</td>
+      <td>University of Texas Health Science Center at Dallas</td>
+      <td>department of pharmacology, university of texas southwestern medical center | university of texas southwestern medical center</td>
+      <td>{'10.7554': 3}</td>
     </tr>
     <tr>
       <td>https://ror.org/05dk0ce17</td>
       <td>3</td>
-      <td>https://ror.org/05dk0ce17</td>
       <td>Washington State University</td>
-      <td>[center for investigation of membrane excitability diseases, department of anesthesiology, washington university school of medicine, post acute medical specialty hospital, las vegas, nevada, united states of america]</td>
+      <td>center for investigation of membrane excitability diseases, department of anesthesiology, washington university school of medicine | post acute medical specialty hospital, las vegas, nevada, united states of america</td>
       <td>{'10.29392': 1, '10.7554': 2}</td>
     </tr>
     <tr>
-      <td>https://ror.org/0294hxs80</td>
-      <td>3</td>
-      <td>https://ror.org/0294hxs80</td>
-      <td>California State University Los Angeles</td>
-      <td>[university of california, los angeles, department of biological sciences, california state university]</td>
-      <td>{'10.7554': 3}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/01y9bpm73</td>
-      <td>3</td>
-      <td>https://ror.org/01y9bpm73</td>
-      <td>University of Göttingen</td>
-      <td>[university of goetttingen, campus institute for dynamics of biological networks]</td>
-      <td>{'10.59704': 1, '10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/012cvds63</td>
-      <td>3</td>
-      <td>https://ror.org/012cvds63</td>
-      <td>Leidos (United States)</td>
-      <td>[leidos biomedical research inc., leidos biomedical research inc]</td>
-      <td>{'10.7554': 3}</td>
-    </tr>
-    <tr>
       <td>https://ror.org/05v9kya57</td>
       <td>3</td>
-      <td>https://ror.org/05v9kya57</td>
       <td>Pázmány Péter Catholic University</td>
-      <td>[szegedi tudomanyegyetem]</td>
+      <td>szegedi tudomanyegyetem</td>
       <td>{'10.14232': 3}</td>
     </tr>
     <tr>
-      <td>https://ror.org/05vt9qd57</td>
-      <td>3</td>
-      <td>https://ror.org/05vt9qd57</td>
-      <td>Rutgers, The State University of New Jersey</td>
-      <td>[rutgers cancer institute of new jersey, rutgers robert wood johnson medical school]</td>
-      <td>{'10.7554': 3}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/01cwqze88</td>
-      <td>3</td>
-      <td>https://ror.org/01cwqze88</td>
-      <td>National Institutes of Health</td>
-      <td>[southwestern medical center 1 department of physiology, , dallas, tx, usa, national institute of child health and human development 1 section on hematopoiesis and lymphocyte biology, eunice kennedy shriver , , bethesda, md, usa, nci/nih]</td>
-      <td>{'10.1084': 1, '10.1085': 1, '10.7554': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/02s376052</td>
-      <td>3</td>
-      <td>https://ror.org/02s376052</td>
-      <td>École Polytechnique Fédérale de Lausanne</td>
-      <td>[instant-lab micromechanical and horological design laboratory (instant-lab), , rue de la maladiere 71b, ch-2000 neuchatel , switzerland, laboratory of biomechanical orthopedics, institute of bioengineering]</td>
-      <td>{'10.1115': 1, '10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/05krs5044</td>
-      <td>3</td>
-      <td>https://ror.org/05krs5044</td>
-      <td>University of Sheffield</td>
-      <td>[school of biosciences, independent academic]</td>
-      <td>{'10.52965': 1, '10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/054vayn55</td>
-      <td>3</td>
-      <td>https://ror.org/054vayn55</td>
-      <td>Consorci Institut D'Investigacions Biomediques August Pi I Sunyer</td>
-      <td>[institut d'investigacions biomediques august pi i sunyer (idibaps) 1 lipid trafficking and disease group, , barcelona, spain, institut d'investigacions biomediques august pi i sunyer (idibaps)]</td>
-      <td>{'10.1083': 1, '10.7554': 2}</td>
-    </tr>
-    <tr>
       <td>https://ror.org/04z4kmw33</td>
       <td>3</td>
-      <td>https://ror.org/04z4kmw33</td>
       <td>Melbourne Health</td>
-      <td>[university of melbourne, melbourne ivf]</td>
+      <td>university of melbourne | melbourne ivf</td>
       <td>{'10.59704': 1, '10.7554': 2}</td>
     </tr>
     <tr>
-      <td>https://ror.org/037zgn354</td>
+      <td>https://ror.org/0294hxs80</td>
       <td>3</td>
-      <td>https://ror.org/037zgn354</td>
-      <td>Johns Hopkins Medicine</td>
-      <td>[johns hopkins university school of medicine, department of mental health, johns hopkins bloomberg school of public health]</td>
+      <td>California State University Los Angeles</td>
+      <td>university of california, los angeles | department of biological sciences, california state university</td>
       <td>{'10.7554': 3}</td>
     </tr>
     <tr>
-      <td>https://ror.org/04cqn7d42</td>
-      <td>2</td>
-      <td>https://ror.org/04cqn7d42</td>
-      <td>University of Colorado Cancer Center</td>
-      <td>[banner md anderson cancer center – north colorado]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/03qxff017</td>
-      <td>2</td>
-      <td>https://ror.org/03qxff017</td>
-      <td>Hebrew University of Jerusalem</td>
-      <td>[department of developmental biology and cancer research, institute of medical research israel-canada, the hebrew university- faculty of medicine]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/00aps1a34</td>
-      <td>2</td>
-      <td>https://ror.org/00aps1a34</td>
-      <td>NIHR Oxford Musculoskeletal Biomedical Research Centre</td>
-      <td>[nihr biomedical research centre]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/01aaptx40</td>
-      <td>2</td>
-      <td>https://ror.org/01aaptx40</td>
-      <td>Indiana University Health</td>
-      <td>[department of microbiology and immunology, indiana university school of medicine]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/00e5k0821</td>
-      <td>2</td>
-      <td>https://ror.org/00e5k0821</td>
-      <td>New York University Abu Dhabi</td>
-      <td>[center for genomics and systems biology, new york university]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/01yr73893</td>
-      <td>2</td>
-      <td>https://ror.org/01yr73893</td>
-      <td>European Molecular Biology Laboratory</td>
-      <td>[epigenetics and neurobiology unit, embl-rome]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/01tx6pn92</td>
-      <td>2</td>
-      <td>https://ror.org/01tx6pn92</td>
-      <td>Texas A&amp;M Health Science Center</td>
-      <td>[department of microbial pathogenesis and immunology, texas aandm health, school of medicine]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/00f7hpc57</td>
-      <td>2</td>
-      <td>https://ror.org/00f7hpc57</td>
-      <td>Friedrich-Alexander-Universität Erlangen-Nürnberg</td>
-      <td>[exploratory research unit, optical imaging centre erlangen]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/00v47pv90</td>
-      <td>2</td>
-      <td>https://ror.org/00v47pv90</td>
-      <td>Baptist Health South Florida</td>
-      <td>[department of hematology oncology, baptist health]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/04gqr8882</td>
-      <td>2</td>
-      <td>https://ror.org/04gqr8882</td>
-      <td>Oncology Hematology Care</td>
-      <td>[department of hematology/oncology, ohio health marion]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/0130frc33</td>
-      <td>2</td>
-      <td>https://ror.org/0130frc33</td>
-      <td>University of North Carolina at Chapel Hill</td>
-      <td>[department of psychiatry, the university of north carolina]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/00dr1cn74</td>
-      <td>2</td>
-      <td>https://ror.org/00dr1cn74</td>
-      <td>Hangzhou Center for Disease Control and Prevention</td>
-      <td>[longyou district center for disease control and prevention]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/01d1z8s73</td>
-      <td>2</td>
-      <td>https://ror.org/01d1z8s73</td>
-      <td>Rostov State University of Economics</td>
-      <td>[fgbou vo andquot;rostovskii gosudarstvennyi ekonomicheskii universitet (rinkh)andquot;]</td>
-      <td>{'10.31483': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/05c1yfj14</td>
-      <td>2</td>
-      <td>https://ror.org/05c1yfj14</td>
-      <td>Xiangya Hospital Central South University</td>
-      <td>[xiangya hospital-international chinese musculoskeletal research society sports medicine research centre]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/04gzb3214</td>
-      <td>2</td>
-      <td>https://ror.org/04gzb3214</td>
-      <td>Yamazaki Gakuen University</td>
-      <td>[department of animal nursing science, yamazaki university of animal health technology]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/01xtthb56</td>
-      <td>2</td>
-      <td>https://ror.org/01xtthb56</td>
-      <td>University of Oslo</td>
-      <td>[centre for molecular medicine norway (ncmm), nordic embl partnership, faculty of medicine]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/02qm18h86</td>
-      <td>2</td>
-      <td>https://ror.org/02qm18h86</td>
-      <td>VA Pittsburgh Healthcare System</td>
-      <td>[section of cardiac electrophysiology, division of cardiology, department of internal medicine, veterans affairs pittsburgh health system]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/05g1k4d79</td>
-      <td>2</td>
-      <td>https://ror.org/05g1k4d79</td>
-      <td>North-Caucasus Federal University</td>
-      <td>[fsaei of he “north-caucasian federal university”]</td>
-      <td>{'10.31483': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/04pyb7y63</td>
-      <td>2</td>
-      <td>https://ror.org/04pyb7y63</td>
-      <td>International Flame Research Foundation</td>
-      <td>[fondazione pisana per la scienza onlus]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/027pk6j83</td>
-      <td>2</td>
-      <td>https://ror.org/027pk6j83</td>
-      <td>Madrid Institute for Advanced Studies</td>
-      <td>[instituto madrileno de estudios avanzados en nanociencia (imdea nanociencia) and nanobiotecnologia (imdea-nanociencia), unidad asociada al centro nacional de biotecnologia (csic)]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/04s1nv328</td>
-      <td>2</td>
-      <td>https://ror.org/04s1nv328</td>
-      <td>University of Canberra</td>
-      <td>[school of archaeology and anthropology, the australian national university]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/05yndxy10</td>
-      <td>2</td>
-      <td>https://ror.org/05yndxy10</td>
-      <td>UCSF Helen Diller Family Comprehensive Cancer Center</td>
-      <td>[department of cell and tissue biology, ucsf]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/01v5xwf23</td>
-      <td>2</td>
-      <td>https://ror.org/01v5xwf23</td>
-      <td>Nestlé (Switzerland)</td>
-      <td>[nestle institute of health sciences, nestle research]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/02g87qh62</td>
-      <td>2</td>
-      <td>https://ror.org/02g87qh62</td>
-      <td>Centro de Investigación Biomédica en Red</td>
-      <td>[biomedical research networking center in bioengineering, biomaterials and nanomedicine (ciber-bbn)]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/04w908n49</td>
-      <td>2</td>
-      <td>https://ror.org/04w908n49</td>
-      <td>Center for the Study of State and Society</td>
-      <td>[investigadora cedes/conicet]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/04nm1cv11</td>
-      <td>2</td>
-      <td>https://ror.org/04nm1cv11</td>
-      <td>University Hospitals Bristol NHS Foundation Trust</td>
-      <td>[medical physics, university hospitals bristol and weston nhs trust]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/036c9yv20</td>
-      <td>2</td>
-      <td>https://ror.org/036c9yv20</td>
-      <td>University of Kansas Medical Center</td>
-      <td>[department of cell biology and physiology at the university of kansas school of medicine]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/043pwc612</td>
-      <td>2</td>
-      <td>https://ror.org/043pwc612</td>
-      <td>Universidade do Porto</td>
-      <td>[cibio, centro de investigacao em biodiversidade e recursos geneticos, biopolis program in genomics, biodiversity and land planning]</td>
-      <td>{'10.1075': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/05pp39346</td>
-      <td>2</td>
-      <td>https://ror.org/05pp39346</td>
-      <td>Haifa Medical Center</td>
-      <td>[department of plastic surgery, rambam medical center]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/01tqkhn82</td>
-      <td>2</td>
-      <td>https://ror.org/01tqkhn82</td>
-      <td>Shandong Entry-Exit Inspection and Quarantine Bureau</td>
-      <td>[shandong tianyu museum of nature]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/01rvn4p91</td>
-      <td>2</td>
-      <td>https://ror.org/01rvn4p91</td>
-      <td>Board of the Swiss Federal Institutes of Technology</td>
-      <td>[department of environmental systems science, swiss federal institute of technology (eth)]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/006e5kg04</td>
-      <td>2</td>
-      <td>https://ror.org/006e5kg04</td>
-      <td>Vrije Universiteit Brussel</td>
-      <td>[vib-vub center for structural biology]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/01h8pf755</td>
-      <td>2</td>
-      <td>https://ror.org/01h8pf755</td>
-      <td>Institut National des Sciences Appliquées de Toulouse</td>
-      <td>[laas-cnrs, universite de toulouse, cnrs, insa]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/00gtg0p11</td>
-      <td>2</td>
-      <td>https://ror.org/00gtg0p11</td>
-      <td>Centre Île-de-France - Jouy-en-Josas - Antony</td>
-      <td>[universite paris-saclay, inrae, agroparistech, micalis institute]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/029brtt94</td>
-      <td>2</td>
-      <td>https://ror.org/029brtt94</td>
-      <td>Université Claude Bernard Lyon 1</td>
-      <td>[cancer research center of lyon (crcl), inserm 1052, cnrs]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/0093wrd09</td>
-      <td>2</td>
-      <td>https://ror.org/0093wrd09</td>
-      <td>Volgograd State University</td>
-      <td>[fgaou vo andquot;volgogradskii gosudarstvennyi universitetandquot;]</td>
-      <td>{'10.31483': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/0161xgx34</td>
-      <td>2</td>
-      <td>https://ror.org/0161xgx34</td>
-      <td>Université de Montréal</td>
-      <td>[department of anatomy and cell biology, mcgill university]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/01y64my43</td>
-      <td>2</td>
-      <td>https://ror.org/01y64my43</td>
-      <td>University at Buffalo, State University of New York</td>
-      <td>[department of biological sciences, state university of new york]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/00zm4rq24</td>
-      <td>2</td>
-      <td>https://ror.org/00zm4rq24</td>
-      <td>University of New Haven</td>
-      <td>[ecology and evolutionary biology, yale university]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/059gcgy73</td>
-      <td>2</td>
-      <td>https://ror.org/059gcgy73</td>
-      <td>Nanjing Medical University</td>
-      <td>[department of obstetrics and gynecology, the affiliated drum tower hospital of nanjing university medical school]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
       <td>https://ror.org/0220qvk04</td>
       <td>2</td>
-      <td>https://ror.org/0220qvk04</td>
       <td>Shanghai Jiao Tong University</td>
-      <td>[department of general surgery, shanghai general hospital]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/03t4gr691</td>
-      <td>2</td>
-      <td>https://ror.org/03t4gr691</td>
-      <td>Academic Medical Center</td>
-      <td>[department of psychiatry, academic medical centre]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/03zbnzt98</td>
-      <td>2</td>
-      <td>https://ror.org/03zbnzt98</td>
-      <td>Woods Hole Oceanographic Institution</td>
-      <td>[mit-whoi joint program in oceanography/applied ocean science and engineering]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/006teas31</td>
-      <td>2</td>
-      <td>https://ror.org/006teas31</td>
-      <td>Shanghai University</td>
-      <td>[college of life science]</td>
+      <td>department of general surgery, shanghai general hospital</td>
       <td>{'10.7554': 2}</td>
     </tr>
     <tr>
       <td>https://ror.org/042pgcv68</td>
       <td>2</td>
-      <td>https://ror.org/042pgcv68</td>
       <td>China Academy of Chinese Medical Sciences</td>
-      <td>[chinese academy of medical sciences]</td>
+      <td>chinese academy of medical sciences</td>
       <td>{'10.7554': 2}</td>
     </tr>
     <tr>
-      <td>https://ror.org/04v00sg98</td>
+      <td>https://ror.org/00dr1cn74</td>
       <td>2</td>
-      <td>https://ror.org/04v00sg98</td>
-      <td>VA Boston Healthcare System</td>
-      <td>[boston va medical center]</td>
+      <td>Hangzhou Center for Disease Control and Prevention</td>
+      <td>longyou district center for disease control and prevention</td>
       <td>{'10.7554': 2}</td>
     </tr>
     <tr>
-      <td>https://ror.org/010j2gw05</td>
+      <td>https://ror.org/006teas31</td>
       <td>2</td>
-      <td>https://ror.org/010j2gw05</td>
-      <td>CEA Paris-Saclay - Etablissement de Fontenay-aux-roses</td>
-      <td>[center for immunology of viral, auto-immune, hematological and bacterial diseases (imva-hb/idmit), universite paris-saclay, inserm, cea]</td>
+      <td>Shanghai University</td>
+      <td>college of life science</td>
       <td>{'10.7554': 2}</td>
     </tr>
     <tr>
-      <td>https://ror.org/02r0e4r58</td>
+      <td>https://ror.org/01zgy1s35</td>
       <td>2</td>
-      <td>https://ror.org/02r0e4r58</td>
-      <td>Jülich Aachen Research Alliance</td>
-      <td>[jara-institute brain structure function relationship]</td>
+      <td>University Medical Center Hamburg-Eppendorf</td>
+      <td>university center of cardiovascular science, university heart and vascular center</td>
       <td>{'10.7554': 2}</td>
     </tr>
     <tr>
-      <td>https://ror.org/03g03ge92</td>
+      <td>https://ror.org/032ghem84</td>
       <td>2</td>
-      <td>https://ror.org/03g03ge92</td>
-      <td>Amgen (United States)</td>
-      <td>[amgen research, oncology 1 , south san francisco, ca, usa, amgen research, research biomics 2 , south san francisco, ca, usa]</td>
-      <td>{'10.1084': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/00f54p054</td>
-      <td>2</td>
-      <td>https://ror.org/00f54p054</td>
-      <td>Stanford University</td>
-      <td>[department of neurology and neurological sciences, stanford neurosciences institute]</td>
+      <td>Reial Acadèmia de Ciències i Arts de Barcelona</td>
+      <td>institute for research in biomedicine (irb barcelona), the barcelona institute of science and technology</td>
       <td>{'10.7554': 2}</td>
     </tr>
     <tr>
-      <td>https://ror.org/00hj8s172</td>
+      <td>https://ror.org/014743444</td>
       <td>2</td>
-      <td>https://ror.org/00hj8s172</td>
-      <td>Columbia University</td>
-      <td>[departments of neurology and pathology and cell biology, institute for cancer genetics, columbia medical center]</td>
+      <td>Forschungsinstitut für Wärmeschutz München</td>
+      <td>gene center, university of munich</td>
       <td>{'10.7554': 2}</td>
     </tr>
     <tr>
-      <td>https://ror.org/051fd9666</td>
+      <td>https://ror.org/02b4apg34</td>
       <td>2</td>
-      <td>https://ror.org/051fd9666</td>
-      <td>Case Western Reserve University</td>
-      <td>[cwru-cleveland vamc center for antimicrobial resistance and epidemiology (case va cares)]</td>
+      <td>Escuela Politécnica Javeriana del Ecuador</td>
+      <td>escuela politecnica nacional</td>
       <td>{'10.7554': 2}</td>
     </tr>
     <tr>
-      <td>https://ror.org/05qsezp22</td>
+      <td>https://ror.org/05pp39346</td>
       <td>2</td>
-      <td>https://ror.org/05qsezp22</td>
-      <td>Agencia de Salud Pública de Barcelona</td>
-      <td>[preventive medicine and public health training unit psmar-aspb-upf]</td>
+      <td>Haifa Medical Center</td>
+      <td>department of plastic surgery, rambam medical center</td>
       <td>{'10.7554': 2}</td>
     </tr>
     <tr>
-      <td>https://ror.org/01sby4e06</td>
+      <td>https://ror.org/01tqkhn82</td>
       <td>2</td>
-      <td>https://ror.org/01sby4e06</td>
-      <td>Nizhny Novgorod State Conservatory named after M.I. Glinka</td>
-      <td>[fgbou vo andquot;nizhegorodskaia gosudarstvennaia konservatoriia im. m.i. glinkiandquot;]</td>
-      <td>{'10.31483': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/03y9bvk93</td>
-      <td>2</td>
-      <td>https://ror.org/03y9bvk93</td>
-      <td>Bolton NHS Foundation Trust</td>
-      <td>[university hospitals bristol and weston nhs foundation trust]</td>
+      <td>Shandong Entry-Exit Inspection and Quarantine Bureau</td>
+      <td>shandong tianyu museum of nature</td>
       <td>{'10.7554': 2}</td>
     </tr>
     <tr>
-      <td>https://ror.org/01jsq2704</td>
+      <td>https://ror.org/021ft0n22</td>
       <td>2</td>
-      <td>https://ror.org/01jsq2704</td>
-      <td>Eötvös Loránd University</td>
-      <td>[mta-elte “lendulet” evolutionary genomics research group]</td>
+      <td>Universitätsmedizin Göttingen</td>
+      <td>charite-universitatsmedizin berlin</td>
       <td>{'10.7554': 2}</td>
     </tr>
     <tr>
-      <td>https://ror.org/04mhzgx49</td>
+      <td>https://ror.org/052133d12</td>
       <td>2</td>
-      <td>https://ror.org/04mhzgx49</td>
-      <td>Tel Aviv University</td>
-      <td>[school of neurobiology, biochemistry and biophysics, the george s. wise faculty of life sciences]</td>
+      <td>University of Indianapolis</td>
+      <td>department of pediatrics, indiana university school of medicine</td>
       <td>{'10.7554': 2}</td>
     </tr>
     <tr>
-      <td>https://ror.org/00pd74e08</td>
+      <td>https://ror.org/0268ecp52</td>
       <td>2</td>
-      <td>https://ror.org/00pd74e08</td>
-      <td>University of Münster</td>
-      <td>[institut fur neuro- und verhaltensbiologie; rontgenstraße]</td>
+      <td>Paris-Est Sup</td>
+      <td>laboratory for food safety, university paris-est, french agency for food, environmental and occupational health and safety</td>
+      <td>{'10.7554': 2}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05hag2y10</td>
+      <td>2</td>
+      <td>Universidade Federal do Acre</td>
+      <td>department of biology, institute of biological sciences, federal university of juiz de fora</td>
       <td>{'10.7554': 2}</td>
     </tr>
     <tr>
       <td>https://ror.org/01hcyya48</td>
       <td>2</td>
-      <td>https://ror.org/01hcyya48</td>
       <td>Cincinnati Children's Hospital Medical Center</td>
-      <td>[department of ophthalmology, university of cincinnati college of medicine]</td>
+      <td>department of ophthalmology, university of cincinnati college of medicine</td>
       <td>{'10.7554': 2}</td>
     </tr>
     <tr>
-      <td>https://ror.org/01yb10j39</td>
+      <td>https://ror.org/05ykr0121</td>
       <td>2</td>
-      <td>https://ror.org/01yb10j39</td>
-      <td>Radboud Institute for Molecular Life Sciences</td>
-      <td>[department of laboratory medicine, laboratory for medical immunology, radboud university medical center]</td>
+      <td>San Francisco State University</td>
+      <td>chan zuckerberg biohub</td>
       <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/01jmxt844</td>
-      <td>2</td>
-      <td>https://ror.org/01jmxt844</td>
-      <td>University of Otago</td>
-      <td>[centre for neuroendocrinology]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/03a26mh11</td>
-      <td>2</td>
-      <td>https://ror.org/03a26mh11</td>
-      <td>Laboratoire de Physique de l'ENS</td>
-      <td>[physics laboratory of the ecole normale superieure]</td>
-      <td>{'10.21468': 2}</td>
     </tr>
     <tr>
       <td>https://ror.org/02ryrf141</td>
       <td>2</td>
-      <td>https://ror.org/02ryrf141</td>
       <td>Van Lang University</td>
-      <td>[department of scientific management and international cooperation, bac lieu university, bac lieu city, bac lieu province, vietnam, bac lieu university, bac lieu city, bac lieu province, vietnam]</td>
+      <td>department of scientific management and international cooperation, bac lieu university, bac lieu city, bac lieu province, vietnam | bac lieu university, bac lieu city, bac lieu province, vietnam</td>
       <td>{'10.46989': 1}</td>
     </tr>
     <tr>
-      <td>https://ror.org/05hag2y10</td>
-      <td>2</td>
-      <td>https://ror.org/05hag2y10</td>
-      <td>Universidade Federal do Acre</td>
-      <td>[department of biology, institute of biological sciences, federal university of juiz de fora]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/005cqsz63</td>
-      <td>2</td>
-      <td>https://ror.org/005cqsz63</td>
-      <td>Hungarian Research Centre for Linguistics</td>
-      <td>[eotvos lorand kutatasi halozat]</td>
-      <td>{'10.14232': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/03858r716</td>
-      <td>2</td>
-      <td>https://ror.org/03858r716</td>
-      <td>National Kaohsiung First University of Science and Technology</td>
-      <td>[national kaohsiung university of science and technology]</td>
-      <td>{'10.1075': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/0268ecp52</td>
-      <td>2</td>
-      <td>https://ror.org/0268ecp52</td>
-      <td>Paris-Est Sup</td>
-      <td>[laboratory for food safety, university paris-est, french agency for food, environmental and occupational health and safety]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/05g916f28</td>
-      <td>2</td>
-      <td>https://ror.org/05g916f28</td>
-      <td>Translational Sciences (United States)</td>
-      <td>[human pathophysiology and translational medicine program, institute for translational sciences, university of texas medical branch]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/05ggc9x40</td>
-      <td>2</td>
-      <td>https://ror.org/05ggc9x40</td>
-      <td>Université Paris-Est Créteil</td>
-      <td>[inserm u955, univ paris est creteil]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/00bq4rw46</td>
-      <td>2</td>
-      <td>https://ror.org/00bq4rw46</td>
-      <td>Hospital Italiano de Buenos Aires</td>
-      <td>[italian hospital of buenos aires]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/05txkk980</td>
-      <td>2</td>
-      <td>https://ror.org/05txkk980</td>
-      <td>Hospital Universitario Infanta Cristina</td>
-      <td>[infanta cristina university hospital]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/05tf9r976</td>
-      <td>2</td>
-      <td>https://ror.org/05tf9r976</td>
-      <td>Chinese People's Liberation Army</td>
-      <td>[department of cardiology and cardiovascular research institute of pla, general hospital of northern theater command]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/05ykr0121</td>
-      <td>2</td>
-      <td>https://ror.org/05ykr0121</td>
-      <td>San Francisco State University</td>
-      <td>[chan zuckerberg biohub]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/059cjpv64</td>
-      <td>2</td>
-      <td>https://ror.org/059cjpv64</td>
-      <td>Second Affiliated Hospital of Zhejiang University</td>
-      <td>[department of big data in health science school of public health, center of clinical big data and analytics of the second affiliated hospital, zhejiang university school of medicine]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/010cncq09</td>
-      <td>2</td>
-      <td>https://ror.org/010cncq09</td>
-      <td>Magnetic Resonance Imaging Institute for Biomedical Research</td>
-      <td>[novartis institutes for biomedical research]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/0403jak37</td>
-      <td>2</td>
-      <td>https://ror.org/0403jak37</td>
-      <td>Al Baha University</td>
-      <td>[department of computer sciences and information technology, albaha university, saudi arabia, department of computer engineering and science, albaha university, albaha 42331, saudi arabia]</td>
-      <td>{'10.57197': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/00trqv719</td>
-      <td>2</td>
-      <td>https://ror.org/00trqv719</td>
-      <td>University of Rochester Medical Center</td>
-      <td>[department of medicine, university of rochester school of medicine and dentistry]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/04rq5mt64</td>
-      <td>2</td>
-      <td>https://ror.org/04rq5mt64</td>
-      <td>University of Maryland, Baltimore</td>
-      <td>[department of physiology, university of marylan school of medicine]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/05t99sp05</td>
-      <td>2</td>
-      <td>https://ror.org/05t99sp05</td>
-      <td>California Coast University</td>
-      <td>[university of california, san francisco, university of california, irvine]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
       <td>https://ror.org/03efmqc40</td>
       <td>2</td>
-      <td>https://ror.org/03efmqc40</td>
       <td>Arizona State University</td>
-      <td>[department of integrative biology and museum of paleontology, university of california, berkeley]</td>
+      <td>department of integrative biology and museum of paleontology, university of california, berkeley</td>
       <td>{'10.7554': 2}</td>
     </tr>
     <tr>
-      <td>https://ror.org/023b0x485</td>
-      <td>2</td>
-      <td>https://ror.org/023b0x485</td>
-      <td>Johannes Gutenberg University Mainz</td>
-      <td>[university of verona, university medical center of the johannes gutenberg university]</td>
-      <td>{'10.22148': 1, '10.7554': 1}</td>
-    </tr>
-    <tr>
       <td>https://ror.org/00sdcjz77</td>
       <td>2</td>
-      <td>https://ror.org/00sdcjz77</td>
       <td>Shenzhen Bay Laboratory</td>
-      <td>[shenzhen institute of ladder for cancer research]</td>
+      <td>shenzhen institute of ladder for cancer research</td>
       <td>{'10.7554': 2}</td>
     </tr>
     <tr>
-      <td>https://ror.org/05dxps055</td>
+      <td>https://ror.org/0161xgx34</td>
       <td>2</td>
-      <td>https://ror.org/05dxps055</td>
-      <td>California Institute of Technology</td>
-      <td>[department of biochemistry and biophysics, university of california, san francisco]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/03fw2bn12</td>
-      <td>2</td>
-      <td>https://ror.org/03fw2bn12</td>
-      <td>Centre d'Imagerie BioMedicale</td>
-      <td>[animal imaging and technology core (ait), center for biomedical imaging (cibm), epfl]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/02tphfq59</td>
-      <td>2</td>
-      <td>https://ror.org/02tphfq59</td>
-      <td>National University of Rosario</td>
-      <td>[laboratorio de metaloproteinas, instituto de biologia molecular y celular de rosario (ibr, conicet-unr)]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/0051rme32</td>
-      <td>2</td>
-      <td>https://ror.org/0051rme32</td>
-      <td>Northwest A&amp;F University</td>
-      <td>[key laboratory of animal biotechnology, ministry of agriculture, northwest agriculture and forest university]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/01aj84f44</td>
-      <td>2</td>
-      <td>https://ror.org/01aj84f44</td>
-      <td>Aarhus University</td>
-      <td>[department of chemistry and interdisciplinary nanoscience centre (inano)]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/03wxxbs05</td>
-      <td>2</td>
-      <td>https://ror.org/03wxxbs05</td>
-      <td>Research Centre for the Humanities</td>
-      <td>[elkh btk]</td>
-      <td>{'10.14232': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/052133d12</td>
-      <td>2</td>
-      <td>https://ror.org/052133d12</td>
-      <td>University of Indianapolis</td>
-      <td>[department of pediatrics, indiana university school of medicine]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/023te5r95</td>
-      <td>2</td>
-      <td>https://ror.org/023te5r95</td>
-      <td>Fifth Affiliated Hospital of Sun Yat-sen University</td>
-      <td>[guangdong provincial key laboratory of biomedical imaging and guangdong provincial engineering research center of molecular imaging, the fifth affiliated hospital, sun yat-sen university]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/0493xsw21</td>
-      <td>2</td>
-      <td>https://ror.org/0493xsw21</td>
-      <td>Berlin Institute of Health at Charité - Universitätsmedizin Berlin</td>
-      <td>[proteomics platform, max delbruck center for molecular medicine in the helmholtz association and berlin institute of health]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/021ft0n22</td>
-      <td>2</td>
-      <td>https://ror.org/021ft0n22</td>
-      <td>Universitätsmedizin Göttingen</td>
-      <td>[charite-universitatsmedizin berlin]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/03b6f4629</td>
-      <td>2</td>
-      <td>https://ror.org/03b6f4629</td>
-      <td>Institut de Recerca en Energia de Catalunya</td>
-      <td>[instituto de investigacion en recursos cinegeticos (irec), csic-uclm-jcc]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/0015ws592</td>
-      <td>2</td>
-      <td>https://ror.org/0015ws592</td>
-      <td>Institut de génétique et de biologie moléculaire et cellulaire</td>
-      <td>[laboratory of cell physics, isis/igbmc, umr 7104, inserm, and university of strasbourg]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/03wgqqb38</td>
-      <td>2</td>
-      <td>https://ror.org/03wgqqb38</td>
-      <td>Beijing HuiLongGuan Hospital</td>
-      <td>[huilong guan hospital, beijing university]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/02smfhw86</td>
-      <td>2</td>
-      <td>https://ror.org/02smfhw86</td>
-      <td>Virginia Tech</td>
-      <td>[fralin biomedical research institute at vtc, center for neurobiology research]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/00wd70b02</td>
-      <td>2</td>
-      <td>https://ror.org/00wd70b02</td>
-      <td>Pennsylvania Department of Environmental Protection</td>
-      <td>[department of pharmacology, perelman school of medicine at the university of pennsylvania]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/03kpdys72</td>
-      <td>2</td>
-      <td>https://ror.org/03kpdys72</td>
-      <td>Triemli Hospital</td>
-      <td>[department of cardiac surgery, stadtspital zurich triemli]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/02917wp91</td>
-      <td>2</td>
-      <td>https://ror.org/02917wp91</td>
-      <td>Hospital of the University of Pennsylvania</td>
-      <td>[division of neurology, department of pediatrics, the children's hospital of philadelphia]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/026sv7t11</td>
-      <td>2</td>
-      <td>https://ror.org/026sv7t11</td>
-      <td>Qingdao National Laboratory for Marine Science and Technology</td>
-      <td>[laboratory for marine biology and biotechnology, qingdao marine science and technology center]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/01qat3289</td>
-      <td>2</td>
-      <td>https://ror.org/01qat3289</td>
-      <td>Eli Lilly (United States)</td>
-      <td>[lilly research laboratories, division of eli lilly and company]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/05rcxtd95</td>
-      <td>2</td>
-      <td>https://ror.org/05rcxtd95</td>
-      <td>Fondazione Santa Lucia</td>
-      <td>[european center for brain research, santa lucia foundation irccs]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/014743444</td>
-      <td>2</td>
-      <td>https://ror.org/014743444</td>
-      <td>Forschungsinstitut für Wärmeschutz München</td>
-      <td>[gene center, university of munich]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/025vn3989</td>
-      <td>2</td>
-      <td>https://ror.org/025vn3989</td>
-      <td>GlaxoSmithKline (United States)</td>
-      <td>[glaxosmithkline-trust in science, global health randd]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/04tm3k558</td>
-      <td>2</td>
-      <td>https://ror.org/04tm3k558</td>
-      <td>Third Affiliated Hospital of Sun Yat-sen University</td>
-      <td>[department of endocrinology and metabolism, the third affiliated hospital, sun yat-sen university]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/0220f5b41</td>
-      <td>2</td>
-      <td>https://ror.org/0220f5b41</td>
-      <td>Tokyo Dental College</td>
-      <td>[tokyo dental junior college]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/013x0ky90</td>
-      <td>2</td>
-      <td>https://ror.org/013x0ky90</td>
-      <td>Alexander Fleming Biomedical Sciences Research Center</td>
-      <td>[institute for fundamental biomedical research, biomedical sciences research center "alexander fleming”]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/02785qs39</td>
-      <td>2</td>
-      <td>https://ror.org/02785qs39</td>
-      <td>Institut de Génétique Moléculaire de Montpellier</td>
-      <td>[umr5535 cnrs-igmm, universite de montpellier]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/006w34k90</td>
-      <td>2</td>
-      <td>https://ror.org/006w34k90</td>
-      <td>Howard Hughes Medical Institute</td>
-      <td>[medical scientist training program, university of california, san diego]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/032ghem84</td>
-      <td>2</td>
-      <td>https://ror.org/032ghem84</td>
-      <td>Reial Acadèmia de Ciències i Arts de Barcelona</td>
-      <td>[institute for research in biomedicine (irb barcelona), the barcelona institute of science and technology]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/01xsqw823</td>
-      <td>2</td>
-      <td>https://ror.org/01xsqw823</td>
-      <td>GlaxoSmithKline (United Kingdom)</td>
-      <td>[glaxosmithkline-trust in science, global health randd]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/000xsnr85</td>
-      <td>2</td>
-      <td>https://ror.org/000xsnr85</td>
-      <td>University of the Basque Country</td>
-      <td>[instituto biofisika, csic-upv/ehu]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/00vbvha87</td>
-      <td>2</td>
-      <td>https://ror.org/00vbvha87</td>
-      <td>Public Health England</td>
-      <td>[immunisation and countermeasures division, uk health security agency]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/02crff812</td>
-      <td>2</td>
-      <td>https://ror.org/02crff812</td>
-      <td>University of Zurich</td>
-      <td>[department of biology and zurich-basel plant science center]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/023h0re83</td>
-      <td>2</td>
-      <td>https://ror.org/023h0re83</td>
-      <td>Hawaii Cancer Care</td>
-      <td>[university of hawaii cancer center]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/02jxrhq31</td>
-      <td>2</td>
-      <td>https://ror.org/02jxrhq31</td>
-      <td>Melanoma Institute Australia</td>
-      <td>[faculty of medicine and health, the university of sydney 4 , sydney, australia, charles perkins centre, the university of sydney 17 , sydney, australia]</td>
-      <td>{'10.1084': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/00ca2c886</td>
-      <td>2</td>
-      <td>https://ror.org/00ca2c886</td>
-      <td>Instituto de Salud Carlos III</td>
-      <td>[red de investigacion cooperativa en terapia celular tercel, isciii.]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/05n8ah907</td>
-      <td>2</td>
-      <td>https://ror.org/05n8ah907</td>
-      <td>Unilever (United Kingdom)</td>
-      <td>[unilever randd, colworth science park]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/02b4apg34</td>
-      <td>2</td>
-      <td>https://ror.org/02b4apg34</td>
-      <td>Escuela Politécnica Javeriana del Ecuador</td>
-      <td>[escuela politecnica nacional]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/02se0t636</td>
-      <td>2</td>
-      <td>https://ror.org/02se0t636</td>
-      <td>Leibniz Institute of Photonic Technology</td>
-      <td>[leibniz-ipht jena]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/02r109517</td>
-      <td>2</td>
-      <td>https://ror.org/02r109517</td>
-      <td>Weill Cornell Medicine</td>
-      <td>[weill cornell/rockefeller/sloan kettering tri-institutional md-phd program]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/04vmvtb21</td>
-      <td>2</td>
-      <td>https://ror.org/04vmvtb21</td>
-      <td>Tulane University</td>
-      <td>[tulane national primate research center]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/02mgw3155</td>
-      <td>2</td>
-      <td>https://ror.org/02mgw3155</td>
-      <td>Centre de Recherche en Cancérologie de Lyon</td>
-      <td>[centre leon berard, departement de biopathologie, centre leon berard]</td>
-      <td>{'10.26508': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/041xzk838</td>
-      <td>2</td>
-      <td>https://ror.org/041xzk838</td>
-      <td>Instituto Biofisika</td>
-      <td>[cnr-ibf, area di ricerca san cataldo]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/05tb9de28</td>
-      <td>2</td>
-      <td>https://ror.org/05tb9de28</td>
-      <td>Charlesson (United States)</td>
-      <td>[massachusetts alzheimer's disease research center]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/010b9wj87</td>
-      <td>2</td>
-      <td>https://ror.org/010b9wj87</td>
-      <td>Boston Medical Center</td>
-      <td>[the pulmonary center and department of medicine, boston university school of medicine]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/03czfpz43</td>
-      <td>2</td>
-      <td>https://ror.org/03czfpz43</td>
-      <td>Emory University</td>
-      <td>[emory institutional research and academic career development award (iracda), fellowships in research and science teaching (first) postdoctoral fellowship]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/02rx3b187</td>
-      <td>2</td>
-      <td>https://ror.org/02rx3b187</td>
-      <td>Université Grenoble Alpes</td>
-      <td>[chu de grenoble, um gi-dpi]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/039zxt351</td>
-      <td>2</td>
-      <td>https://ror.org/039zxt351</td>
-      <td>IRCCS Ospedale San Raffaele</td>
-      <td>[istituto di ricovero e cura a carattere scientifico san raffaele scientific institute 1 division of neuroscience, , milan, italy, istituto di ricovero e cura a carattere scientifico san raffaele scientific institute 2 institute of experimental neurology, , milan, italy]</td>
-      <td>{'10.1083': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/016tfm930</td>
-      <td>2</td>
-      <td>https://ror.org/016tfm930</td>
-      <td>The University of Texas Medical Branch at Galveston</td>
-      <td>[galveston national laboratory]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/01pnej532</td>
-      <td>2</td>
-      <td>https://ror.org/01pnej532</td>
-      <td>University of Szeged</td>
-      <td>[eotvos lorand tudomanyegyetem, federal university of technology]</td>
-      <td>{'10.14232': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/05qwgg493</td>
-      <td>2</td>
-      <td>https://ror.org/05qwgg493</td>
-      <td>Boston University</td>
-      <td>[department of neurobiology, harvard medical school]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/032b8d361</td>
-      <td>2</td>
-      <td>https://ror.org/032b8d361</td>
-      <td>Minneapolis VA Medical Center</td>
-      <td>[brain sciences center, va medical center]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/04v3ywz14</td>
-      <td>2</td>
-      <td>https://ror.org/04v3ywz14</td>
-      <td>China Agricultural University</td>
-      <td>[key laboratory of precision nutrition and food quality, department of nutrition and health, china, agricultural university]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/01f5ytq51</td>
-      <td>2</td>
-      <td>https://ror.org/01f5ytq51</td>
-      <td>Texas A&amp;M University</td>
-      <td>[department of molecular and cellular medicine, college of medicine, texas aandm health science center]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/03d04qg82</td>
-      <td>2</td>
-      <td>https://ror.org/03d04qg82</td>
-      <td>Croatian Academy of Sciences and Arts</td>
-      <td>[hrvatski muzej medicine i farmacije hazu, zavod za povijesne i drustvene znanosti hrvatske akademije znanosti i umjetnosti u rijeci s podrucnom jedinicom u puli]</td>
-      <td>{'10.31745': 1, '10.33604': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/0495fxg12</td>
-      <td>2</td>
-      <td>https://ror.org/0495fxg12</td>
-      <td>Institut Pasteur</td>
-      <td>[association francaise de pediatrie ambulatoire (afpa), 45000]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/0175hh227</td>
-      <td>2</td>
-      <td>https://ror.org/0175hh227</td>
-      <td>Conservatoire National des Arts et Métiers</td>
-      <td>[centre national de reference des pneumocoques, centre hospitalier intercommunal de creteil]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/045ydbe97</td>
-      <td>2</td>
-      <td>https://ror.org/045ydbe97</td>
-      <td>Institutos Nacionais de Ciência e Tecnologia</td>
-      <td>[national institute of science and technology in biomarkers for neuropsychiatry (inctinbion)]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/053avzc18</td>
-      <td>2</td>
-      <td>https://ror.org/053avzc18</td>
-      <td>Czech Academy of Sciences</td>
-      <td>[department of cell differentiation, institute of molecular genetics, academy of sciences of the czech republic v.v.i]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/02mpq6x41</td>
-      <td>2</td>
-      <td>https://ror.org/02mpq6x41</td>
-      <td>University of Illinois Chicago</td>
-      <td>[university of illinois college of medicine 2 department of pharmacology and regenerative medicine, , chicago, il, usa, university of illinois college of medicine 3 division of cardiology, department of medicine, , chicago, il, usa]</td>
-      <td>{'10.1084': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/04r9x1a08</td>
-      <td>2</td>
-      <td>https://ror.org/04r9x1a08</td>
-      <td>AstraZeneca (United Kingdom)</td>
-      <td>[centre for genomic research, discovery sciences, astrazeneca 2 , cambridge, uk, quantitative biology, discovery sciences, astrazeneca 3 , cambridge, uk]</td>
-      <td>{'10.1083': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/001w7jn25</td>
-      <td>2</td>
-      <td>https://ror.org/001w7jn25</td>
-      <td>Charité - Universitätsmedizin Berlin</td>
-      <td>[institute of pathology 1 , , berlin, germany, corporate member of freie universitat berlin, humboldt-universitat zu berlin, and berlin institute of health 8 , , berlin, germany]</td>
-      <td>{'10.1083': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/0081fs513</td>
-      <td>2</td>
-      <td>https://ror.org/0081fs513</td>
-      <td>University of Buenos Aires</td>
-      <td>[departamento de fisica, fceyn uba, ciudad universitaria]</td>
-      <td>{'10.7554': 2}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/0116vew40</td>
-      <td>2</td>
-      <td>https://ror.org/0116vew40</td>
-      <td>Fundación para el Fomento de la Investigación Sanitaria y Biomédica de la Comunitat Valenciana</td>
-      <td>[unidad mixta "infeccion y salud publica" (fisabio-csisp)]</td>
+      <td>Université de Montréal</td>
+      <td>department of anatomy and cell biology, mcgill university</td>
       <td>{'10.7554': 2}</td>
     </tr>
     <tr>
       <td>https://ror.org/04dpcyn69</td>
       <td>2</td>
-      <td>https://ror.org/04dpcyn69</td>
       <td>Kanagawa Prefectural Museum of Cultural History</td>
-      <td>[kanagawa prefectural museum of natural history]</td>
+      <td>kanagawa prefectural museum of natural history</td>
       <td>{'10.7554': 2}</td>
     </tr>
     <tr>
       <td>https://ror.org/02cp04407</td>
       <td>2</td>
-      <td>https://ror.org/02cp04407</td>
       <td>Université de Limoges</td>
-      <td>[chercheur associe ea 6311 fredreseau alec, mica - universite bordeaux montaigne]</td>
+      <td>chercheur associe ea 6311 fredreseau alec | mica - universite bordeaux montaigne</td>
       <td>{'10.25965': 2}</td>
     </tr>
     <tr>
-      <td>https://ror.org/037p24858</td>
+      <td>https://ror.org/023h0re83</td>
       <td>2</td>
-      <td>https://ror.org/037p24858</td>
-      <td>The First Affiliated Hospital, Sun Yat-sen University</td>
-      <td>[guangdong provincial key laboratory of orthopedics and traumatology, department of spinal surgery, the first affiliated hospital of sun yat-sen university]</td>
+      <td>Hawaii Cancer Care</td>
+      <td>university of hawaii cancer center</td>
+      <td>{'10.7554': 2}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02jxrhq31</td>
+      <td>2</td>
+      <td>Melanoma Institute Australia</td>
+      <td>faculty of medicine and health, the university of sydney 4 , sydney, australia | charles perkins centre, the university of sydney 17 , sydney, australia</td>
+      <td>{'10.1084': 1}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05g916f28</td>
+      <td>2</td>
+      <td>Translational Sciences (United States)</td>
+      <td>human pathophysiology and translational medicine program, institute for translational sciences, university of texas medical branch</td>
+      <td>{'10.7554': 2}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00gtg0p11</td>
+      <td>2</td>
+      <td>Centre Île-de-France - Jouy-en-Josas - Antony</td>
+      <td>universite paris-saclay, inrae, agroparistech, micalis institute</td>
+      <td>{'10.7554': 2}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01pnej532</td>
+      <td>2</td>
+      <td>University of Szeged</td>
+      <td>eotvos lorand tudomanyegyetem | federal university of technology</td>
+      <td>{'10.14232': 2}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05qwgg493</td>
+      <td>2</td>
+      <td>Boston University</td>
+      <td>department of neurobiology, harvard medical school</td>
+      <td>{'10.7554': 2}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/0175hh227</td>
+      <td>2</td>
+      <td>Conservatoire National des Arts et Métiers</td>
+      <td>centre national de reference des pneumocoques, centre hospitalier intercommunal de creteil</td>
+      <td>{'10.7554': 2}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/0495fxg12</td>
+      <td>2</td>
+      <td>Institut Pasteur</td>
+      <td>association francaise de pediatrie ambulatoire (afpa), 45000</td>
+      <td>{'10.7554': 2}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05tb9de28</td>
+      <td>2</td>
+      <td>Charlesson (United States)</td>
+      <td>massachusetts alzheimer's disease research center</td>
+      <td>{'10.7554': 2}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/010cncq09</td>
+      <td>2</td>
+      <td>Magnetic Resonance Imaging Institute for Biomedical Research</td>
+      <td>novartis institutes for biomedical research</td>
+      <td>{'10.7554': 2}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/03y9bvk93</td>
+      <td>2</td>
+      <td>Bolton NHS Foundation Trust</td>
+      <td>university hospitals bristol and weston nhs foundation trust</td>
       <td>{'10.7554': 2}</td>
     </tr>
     <tr>
       <td>https://ror.org/0575yy874</td>
       <td>2</td>
-      <td>https://ror.org/0575yy874</td>
       <td>University Medical Center Utrecht</td>
-      <td>[department of pediatrics, nijmegen center for mitochondrial disorders, radboud university medical center]</td>
+      <td>department of pediatrics, nijmegen center for mitochondrial disorders, radboud university medical center</td>
       <td>{'10.7554': 2}</td>
     </tr>
     <tr>
-      <td>https://ror.org/00fq5cm18</td>
+      <td>https://ror.org/04gqr8882</td>
       <td>2</td>
-      <td>https://ror.org/00fq5cm18</td>
-      <td>National Institute on Drug Abuse</td>
-      <td>[nida/nih]</td>
+      <td>Oncology Hematology Care</td>
+      <td>department of hematology/oncology, ohio health marion</td>
       <td>{'10.7554': 2}</td>
     </tr>
     <tr>
-      <td>https://ror.org/00yfw2296</td>
+      <td>https://ror.org/04s1nv328</td>
       <td>2</td>
-      <td>https://ror.org/00yfw2296</td>
-      <td>Istituto Officina dei Materiali</td>
-      <td>[institute of materials (iom-cnr), area science park]</td>
+      <td>University of Canberra</td>
+      <td>school of archaeology and anthropology, the australian national university</td>
+      <td>{'10.7554': 2}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/059gcgy73</td>
+      <td>2</td>
+      <td>Nanjing Medical University</td>
+      <td>department of obstetrics and gynecology, the affiliated drum tower hospital of nanjing university medical school</td>
+      <td>{'10.7554': 2}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00zm4rq24</td>
+      <td>2</td>
+      <td>University of New Haven</td>
+      <td>ecology and evolutionary biology, yale university</td>
+      <td>{'10.7554': 2}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04a7f6w43</td>
+      <td>2</td>
+      <td>Max Planck Institute of Experimental Medicine</td>
+      <td>department of neurogenetics, max planck institute for multidisciplinary sciences</td>
+      <td>{'10.7554': 2}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05t99sp05</td>
+      <td>2</td>
+      <td>California Coast University</td>
+      <td>university of california, san francisco | university of california, irvine</td>
+      <td>{'10.7554': 2}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05dxps055</td>
+      <td>2</td>
+      <td>California Institute of Technology</td>
+      <td>department of biochemistry and biophysics, university of california, san francisco</td>
+      <td>{'10.7554': 2}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/042nb2s44</td>
+      <td>2</td>
+      <td>Massachusetts Institute of Technology</td>
+      <td>department of medicine, division of infectious diseases, massachusetts general hospital</td>
       <td>{'10.7554': 2}</td>
     </tr>
     <tr>
       <td>https://ror.org/012k1v959</td>
       <td>2</td>
-      <td>https://ror.org/012k1v959</td>
       <td>Munich University of Applied Sciences</td>
-      <td>[institute for stroke and dementia research, munich university hospital]</td>
+      <td>institute for stroke and dementia research, munich university hospital</td>
       <td>{'10.7554': 2}</td>
     </tr>
     <tr>
-      <td>https://ror.org/02jz4aj89</td>
-      <td>1</td>
-      <td>https://ror.org/02jz4aj89</td>
-      <td>Maastricht University</td>
-      <td>[pharmacology and personalised medicine, faculty of health, medicine and life science]</td>
-      <td>{'10.58647': 1}</td>
+      <td>https://ror.org/043mz5j54</td>
+      <td>2</td>
+      <td>University of California, San Francisco</td>
+      <td>division of biology and biological engineering, california institute of technology</td>
+      <td>{'10.7554': 2}</td>
     </tr>
     <tr>
-      <td>https://ror.org/00mv6sv71</td>
-      <td>1</td>
-      <td>https://ror.org/00mv6sv71</td>
-      <td>University of Zagreb</td>
-      <td>[odsjek za povijest i zavod za hrvatsku povijest filozofskoga fakulteta sveucilista u zagrebu]</td>
-      <td>{'10.31745': 1}</td>
+      <td>https://ror.org/006w34k90</td>
+      <td>2</td>
+      <td>Howard Hughes Medical Institute</td>
+      <td>medical scientist training program, university of california, san diego</td>
+      <td>{'10.7554': 2}</td>
     </tr>
     <tr>
-      <td>https://ror.org/0420db125</td>
+      <td>https://ror.org/02n96ep67</td>
       <td>1</td>
-      <td>https://ror.org/0420db125</td>
-      <td>Rockefeller University</td>
-      <td>[60 , new york, ny, usa]</td>
-      <td>{'10.1084': 1}</td>
+      <td>East China Normal University</td>
+      <td>shandong university</td>
+      <td>{'10.18122': 1}</td>
     </tr>
     <tr>
-      <td>https://ror.org/01c4pz451</td>
+      <td>https://ror.org/02nbj1r55</td>
       <td>1</td>
-      <td>https://ror.org/01c4pz451</td>
-      <td>Tehran University of Medical Sciences</td>
-      <td>[57 , tehran, iran]</td>
-      <td>{'10.1084': 1}</td>
+      <td>Université des Sciences et de la Technologie d'Oran Mohamed Boudiaf</td>
+      <td>usto university</td>
+      <td>{'10.1075': 1}</td>
     </tr>
     <tr>
-      <td>https://ror.org/012jban78</td>
+      <td>https://ror.org/0011qv509</td>
       <td>1</td>
-      <td>https://ror.org/012jban78</td>
-      <td>Medical University of South Carolina</td>
-      <td>[division of neonatology, shawn jenkins children's hospital]</td>
+      <td>University of Tennessee Health Science Center</td>
+      <td>brown university cancer center</td>
       <td>{'10.7554': 1}</td>
     </tr>
     <tr>
+      <td>https://ror.org/05megwx07</td>
+      <td>1</td>
+      <td>Southern California Orthopedic Institute</td>
+      <td>san francisco orthopaedic residency program</td>
+      <td>{'10.51894': 1}</td>
+    </tr>
+    <tr>
       <td>https://ror.org/020rzx487</td>
       <td>1</td>
-      <td>https://ror.org/020rzx487</td>
       <td>Sheba Medical Center</td>
-      <td>[immunology service 21 , , , , tel aviv, israel]</td>
+      <td>immunology service 21 , , , , tel aviv, israel</td>
       <td>{'10.1084': 1}</td>
     </tr>
     <tr>
-      <td>https://ror.org/02rrdvm96</td>
+      <td>https://ror.org/02vwnat91</td>
       <td>1</td>
-      <td>https://ror.org/02rrdvm96</td>
-      <td>Center for Excellence in Molecular Cell Science</td>
-      <td>[university of chinese academy of sciences 2 , beijing, china]</td>
-      <td>{'10.1084': 1}</td>
+      <td>London South Bank University</td>
+      <td>king's college london</td>
+      <td>{'10.29392': 1}</td>
     </tr>
     <tr>
-      <td>https://ror.org/05r1mzq61</td>
+      <td>https://ror.org/03wjwyj98</td>
       <td>1</td>
-      <td>https://ror.org/05r1mzq61</td>
-      <td>Zhuhai Institute of Advanced Technology</td>
-      <td>[zhuhai college of science and technology]</td>
-      <td>{'10.1075': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/047s2c258</td>
-      <td>1</td>
-      <td>https://ror.org/047s2c258</td>
-      <td>University of Maryland, College Park</td>
-      <td>[university of maryland school of medicine]</td>
+      <td>Eppendorf (Germany)</td>
+      <td>university medical center hamburg-eppendorf</td>
       <td>{'10.7554': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/00kcd6x60</td>
-      <td>1</td>
-      <td>https://ror.org/00kcd6x60</td>
-      <td>Tohoku University Hospital</td>
-      <td>[tohoku university graduate school of medicine 1 department of pediatrics, , sendai, japan]</td>
-      <td>{'10.1084': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/03v76x132</td>
-      <td>1</td>
-      <td>https://ror.org/03v76x132</td>
-      <td>Yale University</td>
-      <td>[yale school of engineering and applied sciences]</td>
-      <td>{'10.7554': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/03xrhmk39</td>
-      <td>1</td>
-      <td>https://ror.org/03xrhmk39</td>
-      <td>Vlaams Instituut voor Biotechnologie</td>
-      <td>[laboratory of immunoregulation and mucosal immunology, vib-ugent center for inflammation research]</td>
-      <td>{'10.7554': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/01azzms13</td>
-      <td>1</td>
-      <td>https://ror.org/01azzms13</td>
-      <td>Universitat de Miguel Hernández d'Elx</td>
-      <td>[instituto de neurociencias · umh-csic campus san juan · alicante, spain]</td>
-      <td>{'10.7554': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/00hj54h04</td>
-      <td>1</td>
-      <td>https://ror.org/00hj54h04</td>
-      <td>The University of Texas at Austin</td>
-      <td>[cnrs, university of bordeaux]</td>
-      <td>{'10.7554': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/04esvpn06</td>
-      <td>1</td>
-      <td>https://ror.org/04esvpn06</td>
-      <td>Virginia State University</td>
-      <td>[virginia polytechnic institute and state university]</td>
-      <td>{'10.7554': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/05ghs6f64</td>
-      <td>1</td>
-      <td>https://ror.org/05ghs6f64</td>
-      <td>Montreal Neurological Institute and Hospital</td>
-      <td>[mni-mcgill university]</td>
-      <td>{'10.7554': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/00zw9nc64</td>
-      <td>1</td>
-      <td>https://ror.org/00zw9nc64</td>
-      <td>University of Miami Health System</td>
-      <td>[and sylvester comprehensive cancer center, miller school of medicine, university of miami 4 department of pathology and laboratory medicine, , miami, fl, usa]</td>
-      <td>{'10.1083': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/04a9tmd77</td>
-      <td>1</td>
-      <td>https://ror.org/04a9tmd77</td>
-      <td>Icahn School of Medicine at Mount Sinai</td>
-      <td>[johns hopkins university school of medicine]</td>
-      <td>{'10.7554': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/04zmssz18</td>
-      <td>1</td>
-      <td>https://ror.org/04zmssz18</td>
-      <td>École Normale Supérieure de Lyon</td>
-      <td>[universite claude bernard de lyon)]</td>
-      <td>{'10.14232': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/01x3kkr08</td>
-      <td>1</td>
-      <td>https://ror.org/01x3kkr08</td>
-      <td>JPMorgan Chase &amp; Co (United States)</td>
-      <td>[j.p.morgan ai research and algocrypt coe]</td>
-      <td>{'10.62056': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/00d0nc645</td>
-      <td>1</td>
-      <td>https://ror.org/00d0nc645</td>
-      <td>Microsoft (United States)</td>
-      <td>[microsoft research]</td>
-      <td>{'10.62056': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/045syc608</td>
-      <td>1</td>
-      <td>https://ror.org/045syc608</td>
-      <td>Czech Academy of Sciences, Institute of Molecular Genetics</td>
-      <td>[institute of microbiology of the czech academy of sciences]</td>
-      <td>{'10.7554': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/04q42nz13</td>
-      <td>1</td>
-      <td>https://ror.org/04q42nz13</td>
-      <td>Institute of Cognitive Neuroscience and Psychology</td>
-      <td>[mta pszichologiai kutatointezet]</td>
-      <td>{'10.14232': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/04skqfp25</td>
-      <td>1</td>
-      <td>https://ror.org/04skqfp25</td>
-      <td>St. Michael's Hospital</td>
-      <td>[critical care medicine, department of medicine, faculty of medicine, chulalongkorn university]</td>
-      <td>{'10.29390': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/050c3pq49</td>
-      <td>1</td>
-      <td>https://ror.org/050c3pq49</td>
-      <td>Fondation pour l’innovation en Cadiométabolisme et Nutrition</td>
-      <td>[ihu ican]</td>
-      <td>{'10.7554': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/03r4m3349</td>
-      <td>1</td>
-      <td>https://ror.org/03r4m3349</td>
-      <td>Erasmus MC Cancer Institute</td>
-      <td>[erasmus university medical center]</td>
-      <td>{'10.7554': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/01zqrxf85</td>
-      <td>1</td>
-      <td>https://ror.org/01zqrxf85</td>
-      <td>Institute of Molecular Biotechnology</td>
-      <td>[imba-autrian academy of sciences]</td>
-      <td>{'10.7554': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/026h43663</td>
-      <td>1</td>
-      <td>https://ror.org/026h43663</td>
-      <td>Centre de Recherches Linguistiques sur l'Asie Orientale</td>
-      <td>[inalco-crlao]</td>
-      <td>{'10.1075': 1}</td>
     </tr>
     <tr>
       <td>https://ror.org/00240q980</td>
       <td>1</td>
-      <td>https://ror.org/00240q980</td>
       <td>University of Padua</td>
-      <td>[hit, human inspired technologies research centre]</td>
+      <td>hit, human inspired technologies research centre</td>
       <td>{'10.1075': 1}</td>
     </tr>
     <tr>
-      <td>https://ror.org/04cvxnb49</td>
+      <td>https://ror.org/04zmssz18</td>
       <td>1</td>
-      <td>https://ror.org/04cvxnb49</td>
-      <td>Goethe University Frankfurt</td>
-      <td>[university of frankfurt]</td>
-      <td>{'10.1075': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/03vs46t66</td>
-      <td>1</td>
-      <td>https://ror.org/03vs46t66</td>
-      <td>Université de Cergy-Pontoise</td>
-      <td>[cy cergy paris university]</td>
-      <td>{'10.21468': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/033003e23</td>
-      <td>1</td>
-      <td>https://ror.org/033003e23</td>
-      <td>Tampere University</td>
-      <td>[university of tampere]</td>
+      <td>École Normale Supérieure de Lyon</td>
+      <td>universite claude bernard de lyon)</td>
       <td>{'10.14232': 1}</td>
     </tr>
     <tr>
-      <td>https://ror.org/03ap2av50</td>
+      <td>https://ror.org/04a9tmd77</td>
       <td>1</td>
-      <td>https://ror.org/03ap2av50</td>
-      <td>Max Planck Institute of Neurobiology</td>
-      <td>[max-planck institut fur neurobiologie]</td>
+      <td>Icahn School of Medicine at Mount Sinai</td>
+      <td>johns hopkins university school of medicine</td>
       <td>{'10.7554': 1}</td>
     </tr>
     <tr>
-      <td>https://ror.org/02qz8b764</td>
+      <td>https://ror.org/03ht1xw27</td>
       <td>1</td>
-      <td>https://ror.org/02qz8b764</td>
-      <td>Cold Spring Harbor Laboratory</td>
-      <td>[executive editor, life science alliance]</td>
-      <td>{'10.26508': 1}</td>
+      <td>Tata Institute of Fundamental Research</td>
+      <td>tata institute for genetics and society</td>
+      <td>{'10.7554': 1}</td>
     </tr>
     <tr>
-      <td>https://ror.org/030sbze61</td>
+      <td>https://ror.org/02en5vm52</td>
       <td>1</td>
-      <td>https://ror.org/030sbze61</td>
-      <td>Institute for Molecular Medicine Finland</td>
-      <td>[university of helsinki/fimm]</td>
+      <td>Sorbonne Université</td>
+      <td>shengjing hospital of china medical university</td>
       <td>{'10.7554': 1}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00cahhs35</td>
+      <td>1</td>
+      <td>Northwest Watershed Research Center</td>
+      <td>usda-ars</td>
+      <td>{'10.18122': 1}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/02qte9q33</td>
+      <td>1</td>
+      <td>University of Stavanger</td>
+      <td>university of stavangar</td>
+      <td>{'10.53288': 1}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01cwqze88</td>
+      <td>1</td>
+      <td>National Institutes of Health</td>
+      <td>southwestern medical center 1 department of physiology, , dallas, tx, usa</td>
+      <td>{'10.1085': 1}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01z1bn264</td>
+      <td>1</td>
+      <td>University of Languages and International Studies</td>
+      <td>vietnam national university</td>
+      <td>{'10.1075': 1}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/0106qb496</td>
+      <td>1</td>
+      <td>Inner Mongolia University</td>
+      <td>inner mongolia art college</td>
+      <td>{'10.1075': 1}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/000h6jb29</td>
+      <td>1</td>
+      <td>Helmholtz Centre for Environmental Research</td>
+      <td>helmholtz centre for infection research</td>
+      <td>{'10.7554': 1}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00fhc9y79</td>
+      <td>1</td>
+      <td>Guangdong University of Foreign Studies</td>
+      <td>shenzhen technology university</td>
+      <td>{'10.1075': 1}</td>
     </tr>
     <tr>
       <td>https://ror.org/009n8zh45</td>
       <td>1</td>
-      <td>https://ror.org/009n8zh45</td>
       <td>The University of Dodoma</td>
-      <td>[universidad carlos iii de madrid]</td>
+      <td>universidad carlos iii de madrid</td>
       <td>{'10.48168': 1}</td>
     </tr>
     <tr>
       <td>https://ror.org/043nxc105</td>
       <td>1</td>
-      <td>https://ror.org/043nxc105</td>
       <td>Universitat de València</td>
-      <td>[grupo val.es.co.]</td>
+      <td>grupo val.es.co.</td>
       <td>{'10.1075': 1}</td>
     </tr>
     <tr>
-      <td>https://ror.org/04b6nzv94</td>
-      <td>1</td>
-      <td>https://ror.org/04b6nzv94</td>
-      <td>Brigham and Women's Hospital</td>
-      <td>[blavatnik institute, harvard medical school 1 department of immunology, , boston, ma, usa]</td>
-      <td>{'10.1084': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/01cmst727</td>
-      <td>1</td>
-      <td>https://ror.org/01cmst727</td>
-      <td>Simons Foundation</td>
-      <td>[flatiron institute]</td>
-      <td>{'10.7554': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/00j4k1h63</td>
-      <td>1</td>
-      <td>https://ror.org/00j4k1h63</td>
-      <td>National Institute of Environmental Health Sciences</td>
-      <td>[nih/niehs]</td>
-      <td>{'10.7554': 1}</td>
-    </tr>
-    <tr>
       <td>https://ror.org/04hexsd31</td>
       <td>1</td>
-      <td>https://ror.org/04hexsd31</td>
       <td>Geneva Finance Research Institute</td>
-      <td>[graduate institute of international and development studies, ch]</td>
+      <td>graduate institute of international and development studies, ch</td>
       <td>{'10.59704': 1}</td>
     </tr>
     <tr>
-      <td>https://ror.org/02w7k5y22</td>
+      <td>https://ror.org/02qz8b764</td>
       <td>1</td>
-      <td>https://ror.org/02w7k5y22</td>
-      <td>Datta Meghe Institute of Medical Sciences</td>
-      <td>[phd scholar,dept of periodontology,dmiher, wardha,maharashtra,india]</td>
-      <td>{'10.14293': 1}</td>
+      <td>Cold Spring Harbor Laboratory</td>
+      <td>executive editor, life science alliance</td>
+      <td>{'10.26508': 1}</td>
     </tr>
     <tr>
-      <td>https://ror.org/03z3mg085</td>
+      <td>https://ror.org/052gg0110</td>
       <td>1</td>
-      <td>https://ror.org/03z3mg085</td>
-      <td>Paracelsus Medical University</td>
-      <td>[pmu salzburg]</td>
-      <td>{'10.7554': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/05t2njg22</td>
-      <td>1</td>
-      <td>https://ror.org/05t2njg22</td>
-      <td>Institute of Ethnology</td>
-      <td>[czech academy of sciences]</td>
-      <td>{'10.1075': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/05dq2gs74</td>
-      <td>1</td>
-      <td>https://ror.org/05dq2gs74</td>
-      <td>Vanderbilt University Medical Center</td>
-      <td>[vanderbilt university school of medicine 2 department of cell and developmental biology, , nashville, tn, usa]</td>
-      <td>{'10.1083': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/03cdgfs84</td>
-      <td>1</td>
-      <td>https://ror.org/03cdgfs84</td>
-      <td>Landschaftsverband Westfalen-Lippe</td>
-      <td>[lwl-archaologie fur westfalen]</td>
-      <td>{'10.38072': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/0327sr118</td>
-      <td>1</td>
-      <td>https://ror.org/0327sr118</td>
-      <td>DIPF | Leibniz Institute for Research and Information in Education</td>
-      <td>[german institute for international educational research]</td>
-      <td>{'10.38072': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/0245cg223</td>
-      <td>1</td>
-      <td>https://ror.org/0245cg223</td>
-      <td>University of Freiburg</td>
-      <td>[universite de fribourg 10 department of biology, , fribourg, switzerland]</td>
+      <td>University of Oxford</td>
+      <td>university of colorado school of medicine 1 department of immunology and microbiology, , aurora, co, usa</td>
       <td>{'10.1084': 1}</td>
     </tr>
     <tr>
-      <td>https://ror.org/0509e3289</td>
+      <td>https://ror.org/03nxex423</td>
       <td>1</td>
-      <td>https://ror.org/0509e3289</td>
-      <td>National Institute of Anthropology and History</td>
-      <td>[escuela nacional de antropologia e historia]</td>
-      <td>{'10.1075': 1}</td>
+      <td>King Center</td>
+      <td>rehabilitation health sciences, king saud university</td>
+      <td>{'10.26603': 1}</td>
     </tr>
     <tr>
-      <td>https://ror.org/04xeg9z08</td>
+      <td>https://ror.org/03e76ya46</td>
       <td>1</td>
-      <td>https://ror.org/04xeg9z08</td>
-      <td>National Institute of Mental Health</td>
-      <td>[nih/nimh]</td>
+      <td>Max Planck Institute for Biophysical Chemistry</td>
+      <td>max planck institute for biochemistry</td>
       <td>{'10.7554': 1}</td>
     </tr>
     <tr>
-      <td>https://ror.org/01t8svj65</td>
+      <td>https://ror.org/05byvp690</td>
       <td>1</td>
-      <td>https://ror.org/01t8svj65</td>
-      <td>University of California San Francisco Medical Center</td>
-      <td>[university of california, san francisco 2 department of medicine, , san francisco, ca, usa]</td>
-      <td>{'10.1084': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/03e3qgk42</td>
-      <td>1</td>
-      <td>https://ror.org/03e3qgk42</td>
-      <td>University of Wisconsin Health</td>
-      <td>[university of wisconsin school of medicine and public health]</td>
+      <td>The University of Texas Southwestern Medical Center</td>
+      <td>university of texas health science center at houston, mcgovern medical school</td>
       <td>{'10.7554': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/05qpmg879</td>
-      <td>1</td>
-      <td>https://ror.org/05qpmg879</td>
-      <td>Institut de Biologie Moléculaire et Cellulaire</td>
-      <td>[instituto de investigacao e inovacao em saude – i3s, universidade do porto 1 , porto, portugal]</td>
-      <td>{'10.1083': 1}</td>
     </tr>
     <tr>
       <td>https://ror.org/03mstc592</td>
       <td>1</td>
-      <td>https://ror.org/03mstc592</td>
       <td>European Molecular Biology Laboratory</td>
-      <td>[cell biology, university of kaiserslautern]</td>
+      <td>cell biology, university of kaiserslautern</td>
       <td>{'10.26508': 1}</td>
     </tr>
     <tr>
       <td>https://ror.org/04zrf7b53</td>
       <td>1</td>
-      <td>https://ror.org/04zrf7b53</td>
       <td>University of Kaiserslautern</td>
-      <td>[proteomics core facility, embl heidelberg]</td>
+      <td>proteomics core facility, embl heidelberg</td>
       <td>{'10.26508': 1}</td>
     </tr>
     <tr>
-      <td>https://ror.org/04td37d32</td>
-      <td>1</td>
-      <td>https://ror.org/04td37d32</td>
-      <td>Institut National de la Recherche Scientifique</td>
-      <td>[inrs-energy and materials, canada]</td>
-      <td>{'10.25159': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/02j46qs45</td>
-      <td>1</td>
-      <td>https://ror.org/02j46qs45</td>
-      <td>Masaryk University</td>
-      <td>[faculty of arts]</td>
-      <td>{'10.1075': 1}</td>
-    </tr>
-    <tr>
       <td>https://ror.org/00s8vne50</td>
       <td>1</td>
-      <td>https://ror.org/00s8vne50</td>
       <td>Yerevan State University</td>
-      <td>[alikhanyan national laboratory]</td>
+      <td>alikhanyan national laboratory</td>
       <td>{'10.21468': 1}</td>
     </tr>
     <tr>
-      <td>https://ror.org/040r8fr65</td>
+      <td>https://ror.org/00675rp98</td>
       <td>1</td>
-      <td>https://ror.org/040r8fr65</td>
-      <td>Aarhus University Hospital</td>
-      <td>[department of clinical medicine]</td>
-      <td>{'10.26508': 1}</td>
+      <td>Centre National pour la Recherche Scientifique et Technique (CNRST)</td>
+      <td>laboratoire de physiologie cellulaire et vegetale, cnrs 1 , , grenoble, france</td>
+      <td>{'10.1083': 1}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/0245cg223</td>
+      <td>1</td>
+      <td>University of Freiburg</td>
+      <td>universite de fribourg 10 department of biology, , fribourg, switzerland</td>
+      <td>{'10.1084': 1}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05qpmg879</td>
+      <td>1</td>
+      <td>Institut de Biologie Moléculaire et Cellulaire</td>
+      <td>instituto de investigacao e inovacao em saude – i3s, universidade do porto 1 , porto, portugal</td>
+      <td>{'10.1083': 1}</td>
     </tr>
     <tr>
       <td>https://ror.org/00rqy9422</td>
       <td>1</td>
-      <td>https://ror.org/00rqy9422</td>
       <td>University of Queensland</td>
-      <td>[internal medicine service, the prince charles hospital, brisbane, australia]</td>
+      <td>internal medicine service, the prince charles hospital, brisbane, australia</td>
       <td>{'10.56392': 1}</td>
     </tr>
     <tr>
-      <td>https://ror.org/010fzp376</td>
-      <td>1</td>
-      <td>https://ror.org/010fzp376</td>
-      <td>Nanion (Germany)</td>
-      <td>[nanion technologies gmbh 1 , munchen, germany]</td>
-      <td>{'10.1085': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/05bnh6r87</td>
-      <td>1</td>
-      <td>https://ror.org/05bnh6r87</td>
-      <td>Cornell University</td>
-      <td>[weill-cornel medical college, tri-institutional m.d./ph.d. program]</td>
-      <td>{'10.7554': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/0145fw131</td>
-      <td>1</td>
-      <td>https://ror.org/0145fw131</td>
-      <td>Hong Kong Baptist University</td>
-      <td>[bnu-hkbu united international college]</td>
-      <td>{'10.1075': 1}</td>
-    </tr>
-    <tr>
       <td>https://ror.org/03gnh5541</td>
       <td>1</td>
-      <td>https://ror.org/03gnh5541</td>
       <td>Institute of Science and Technology Austria</td>
-      <td>[institue of science and technology]</td>
+      <td>institue of science and technology</td>
       <td>{'10.7554': 1}</td>
     </tr>
     <tr>
-      <td>https://ror.org/038207k30</td>
+      <td>https://ror.org/05krs5044</td>
       <td>1</td>
-      <td>https://ror.org/038207k30</td>
-      <td>Laboratoire Génome et Développement des Plantes</td>
-      <td>[lgdp-umr5096]</td>
-      <td>{'10.26508': 1}</td>
+      <td>University of Sheffield</td>
+      <td>independent academic</td>
+      <td>{'10.52965': 1}</td>
     </tr>
     <tr>
-      <td>https://ror.org/05mv4rb84</td>
+      <td>https://ror.org/023b0x485</td>
       <td>1</td>
-      <td>https://ror.org/05mv4rb84</td>
-      <td>Medicines Evaluation Board</td>
-      <td>[cbg, utrecht (the netherlands)]</td>
-      <td>{'10.58647': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/02n96ep67</td>
-      <td>1</td>
-      <td>https://ror.org/02n96ep67</td>
-      <td>East China Normal University</td>
-      <td>[shandong university]</td>
-      <td>{'10.18122': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/0011qv509</td>
-      <td>1</td>
-      <td>https://ror.org/0011qv509</td>
-      <td>University of Tennessee Health Science Center</td>
-      <td>[brown university cancer center]</td>
-      <td>{'10.7554': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/02qte9q33</td>
-      <td>1</td>
-      <td>https://ror.org/02qte9q33</td>
-      <td>University of Stavanger</td>
-      <td>[university of stavangar]</td>
-      <td>{'10.53288': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/023zg8w32</td>
-      <td>1</td>
-      <td>https://ror.org/023zg8w32</td>
-      <td>Institut National des Langues et Civilisations Orientales</td>
-      <td>[inalco/cermom]</td>
-      <td>{'10.1075': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/02nbj1r55</td>
-      <td>1</td>
-      <td>https://ror.org/02nbj1r55</td>
-      <td>Université des Sciences et de la Technologie d'Oran Mohamed Boudiaf</td>
-      <td>[usto university]</td>
-      <td>{'10.1075': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/00675rp98</td>
-      <td>1</td>
-      <td>https://ror.org/00675rp98</td>
-      <td>Centre National pour la Recherche Scientifique et Technique (CNRST)</td>
-      <td>[laboratoire de physiologie cellulaire et vegetale, cnrs 1 , , grenoble, france]</td>
-      <td>{'10.1083': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/04emwm605</td>
-      <td>1</td>
-      <td>https://ror.org/04emwm605</td>
-      <td>Thales (France)</td>
-      <td>[thales gennevilliers]</td>
-      <td>{'10.62056': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/04p1xtv71</td>
-      <td>1</td>
-      <td>https://ror.org/04p1xtv71</td>
-      <td>Seagate (United States)</td>
-      <td>[seagate research group]</td>
-      <td>{'10.62056': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/05m3r1b84</td>
-      <td>1</td>
-      <td>https://ror.org/05m3r1b84</td>
-      <td>Institut de Mathématiques de Bordeaux</td>
-      <td>[univ. bordeaux, cnrs, inria, bordeaux inp]</td>
-      <td>{'10.62056': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/03e76ya46</td>
-      <td>1</td>
-      <td>https://ror.org/03e76ya46</td>
-      <td>Max Planck Institute for Biophysical Chemistry</td>
-      <td>[max planck institute for biochemistry]</td>
-      <td>{'10.7554': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/05byvp690</td>
-      <td>1</td>
-      <td>https://ror.org/05byvp690</td>
-      <td>The University of Texas Southwestern Medical Center</td>
-      <td>[university of texas health science center at houston, mcgovern medical school]</td>
-      <td>{'10.7554': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/05h1kgg64</td>
-      <td>1</td>
-      <td>https://ror.org/05h1kgg64</td>
-      <td>National Institute of Health</td>
-      <td>[national institutes of health 6 biodata mining and discovery section, national institute of arthritis and musculoskeletal and skin diseases, , bethesda, md, usa]</td>
-      <td>{'10.1084': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/03nxex423</td>
-      <td>1</td>
-      <td>https://ror.org/03nxex423</td>
-      <td>King Center</td>
-      <td>[rehabilitation health sciences, king saud university]</td>
-      <td>{'10.26603': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/02qyf5152</td>
-      <td>1</td>
-      <td>https://ror.org/02qyf5152</td>
-      <td>Indian Institute of Technology Bombay</td>
-      <td>[department of biosciences and bioengineering, iit]</td>
-      <td>{'10.26508': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/03ht1xw27</td>
-      <td>1</td>
-      <td>https://ror.org/03ht1xw27</td>
-      <td>Tata Institute of Fundamental Research</td>
-      <td>[tata institute for genetics and society]</td>
-      <td>{'10.7554': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/00cahhs35</td>
-      <td>1</td>
-      <td>https://ror.org/00cahhs35</td>
-      <td>Northwest Watershed Research Center</td>
-      <td>[usda-ars]</td>
-      <td>{'10.18122': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/02en5vm52</td>
-      <td>1</td>
-      <td>https://ror.org/02en5vm52</td>
-      <td>Sorbonne Université</td>
-      <td>[shengjing hospital of china medical university]</td>
-      <td>{'10.7554': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/02ma4wv74</td>
-      <td>1</td>
-      <td>https://ror.org/02ma4wv74</td>
-      <td>King Abdulaziz University</td>
-      <td>[college of applied medical sciences, king abdul-aziz university 3 , jeddah, saudi arabia]</td>
-      <td>{'10.1084': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/02t1bej08</td>
-      <td>1</td>
-      <td>https://ror.org/02t1bej08</td>
-      <td>Monash Health</td>
-      <td>[australian centre for blood diseases, monash university 8 , melbourne, australia]</td>
-      <td>{'10.1084': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/000h6jb29</td>
-      <td>1</td>
-      <td>https://ror.org/000h6jb29</td>
-      <td>Helmholtz Centre for Environmental Research</td>
-      <td>[helmholtz centre for infection research]</td>
-      <td>{'10.7554': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/00fhc9y79</td>
-      <td>1</td>
-      <td>https://ror.org/00fhc9y79</td>
-      <td>Guangdong University of Foreign Studies</td>
-      <td>[shenzhen technology university]</td>
-      <td>{'10.1075': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/01z1bn264</td>
-      <td>1</td>
-      <td>https://ror.org/01z1bn264</td>
-      <td>University of Languages and International Studies</td>
-      <td>[vietnam national university]</td>
-      <td>{'10.1075': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/04dkp9463</td>
-      <td>1</td>
-      <td>https://ror.org/04dkp9463</td>
-      <td>University of Amsterdam</td>
-      <td>[swammerdam institute for life sciences, section of molecular cytology, van leeuwenhoek centre for advanced microscopy 2 , , amsterdam, the netherlands]</td>
-      <td>{'10.1083': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/052gg0110</td>
-      <td>1</td>
-      <td>https://ror.org/052gg0110</td>
-      <td>University of Oxford</td>
-      <td>[university of colorado school of medicine 1 department of immunology and microbiology, , aurora, co, usa]</td>
-      <td>{'10.1084': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/04t908e09</td>
-      <td>1</td>
-      <td>https://ror.org/04t908e09</td>
-      <td>Olivia Newton-John Cancer Wellness &amp; Research Centre</td>
-      <td>[olivia newton-john cancer research institute]</td>
-      <td>{'10.7554': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/04wwqze12</td>
-      <td>1</td>
-      <td>https://ror.org/04wwqze12</td>
-      <td>Peking University Third Hospital</td>
-      <td>[key laboratory of assisted reproduction (peking university)]</td>
-      <td>{'10.26508': 1}</td>
+      <td>Johannes Gutenberg University Mainz</td>
+      <td>university of verona</td>
+      <td>{'10.22148': 1}</td>
     </tr>
     <tr>
       <td>https://ror.org/0007sdx38</td>
       <td>1</td>
-      <td>https://ror.org/0007sdx38</td>
       <td>BMG (Japan)</td>
-      <td>[bmj]</td>
+      <td>bmj</td>
       <td>{'10.14293': 1}</td>
     </tr>
     <tr>
       <td>https://ror.org/02827ca86</td>
       <td>1</td>
-      <td>https://ror.org/02827ca86</td>
       <td>Prince of Wales Hospital</td>
-      <td>[department of orthopedics, faculty of medicine, prince of songkla university, songkhla, 90110, thailand.]</td>
+      <td>department of orthopedics, faculty of medicine, prince of songkla university, songkhla, 90110, thailand.</td>
       <td>{'10.52965': 1}</td>
     </tr>
     <tr>
-      <td>https://ror.org/03vek6s52</td>
+      <td>https://ror.org/0420db125</td>
       <td>1</td>
-      <td>https://ror.org/03vek6s52</td>
-      <td>Harvard University</td>
-      <td>[harvard school of public health]</td>
-      <td>{'10.7554': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/050c3cw24</td>
-      <td>1</td>
-      <td>https://ror.org/050c3cw24</td>
-      <td>Universitat de Lleida</td>
-      <td>[universidad de sevilla]</td>
-      <td>{'10.7554': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/00jmfr291</td>
-      <td>1</td>
-      <td>https://ror.org/00jmfr291</td>
-      <td>University of Michigan–Ann Arbor</td>
-      <td>[molecular and integrative physiology graduate program, university 7 , ann arbor, mi, usa]</td>
-      <td>{'10.1083': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/0106qb496</td>
-      <td>1</td>
-      <td>https://ror.org/0106qb496</td>
-      <td>Inner Mongolia University</td>
-      <td>[inner mongolia art college]</td>
-      <td>{'10.1075': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/04cwap208</td>
-      <td>1</td>
-      <td>https://ror.org/04cwap208</td>
-      <td>Inner Mongolia University for Nationalities</td>
-      <td>[inner mongolia minzu university]</td>
-      <td>{'10.1075': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/04wjk1035</td>
-      <td>1</td>
-      <td>https://ror.org/04wjk1035</td>
-      <td>i3S - Instituto de Investigação e Inovação em Saúde, Universidade do Porto</td>
-      <td>[programa doutoral em biomedicina, faculdade de medicina, universidade do porto]</td>
-      <td>{'10.26508': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/03wjwyj98</td>
-      <td>1</td>
-      <td>https://ror.org/03wjwyj98</td>
-      <td>Eppendorf (Germany)</td>
-      <td>[university medical center hamburg-eppendorf]</td>
-      <td>{'10.7554': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/04gw3ra78</td>
-      <td>1</td>
-      <td>https://ror.org/04gw3ra78</td>
-      <td>Chinese PLA General Hospital</td>
-      <td>[the first medical center, chinese people's liberation army general hospital 4 department of bio-therapeutic, , beijing, china]</td>
-      <td>{'10.1084': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/022485d27</td>
-      <td>1</td>
-      <td>https://ror.org/022485d27</td>
-      <td>College of Agriculture at Križevci</td>
-      <td>[visoko gospodarsko uciliste u krizevcima]</td>
-      <td>{'10.33128': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/02vwnat91</td>
-      <td>1</td>
-      <td>https://ror.org/02vwnat91</td>
-      <td>London South Bank University</td>
-      <td>[king's college london]</td>
-      <td>{'10.29392': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/01pxwe438</td>
-      <td>1</td>
-      <td>https://ror.org/01pxwe438</td>
-      <td>McGill University</td>
-      <td>[mcgill centre for microbiome research]</td>
-      <td>{'10.7554': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/00cfam450</td>
-      <td>1</td>
-      <td>https://ror.org/00cfam450</td>
-      <td>Helmholtz Zentrum München</td>
-      <td>[institute of epigenetics and stem cells (ies), helmholtz munich 1 , munchen, germany]</td>
-      <td>{'10.1083': 1}</td>
-    </tr>
-    <tr>
-      <td>https://ror.org/005dvqh91</td>
-      <td>1</td>
-      <td>https://ror.org/005dvqh91</td>
-      <td>NYU Langone Health</td>
-      <td>[department of microbiology, new york university grossman school of medicine 1 , new york, ny, usa]</td>
+      <td>Rockefeller University</td>
+      <td>60 , new york, ny, usa</td>
       <td>{'10.1084': 1}</td>
     </tr>
     <tr>
       <td>https://ror.org/04t0gwh46</td>
       <td>1</td>
-      <td>https://ror.org/04t0gwh46</td>
       <td>Institut Curie</td>
-      <td>[1 , paris, france]</td>
+      <td>1 , paris, france</td>
       <td>{'10.1084': 1}</td>
     </tr>
     <tr>
-      <td>https://ror.org/0431sk359</td>
+      <td>https://ror.org/050c3cw24</td>
       <td>1</td>
-      <td>https://ror.org/0431sk359</td>
-      <td>Marine Biological Association of the United Kingdom</td>
-      <td>[marine biological association of the uk]</td>
+      <td>Universitat de Lleida</td>
+      <td>universidad de sevilla</td>
+      <td>{'10.7554': 1}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/01c4pz451</td>
+      <td>1</td>
+      <td>Tehran University of Medical Sciences</td>
+      <td>57 , tehran, iran</td>
+      <td>{'10.1084': 1}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/043pwc612</td>
+      <td>1</td>
+      <td>Universidade do Porto</td>
+      <td>biopolis program in genomics, biodiversity and land planning</td>
+      <td>{'10.1075': 1}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/00hj54h04</td>
+      <td>1</td>
+      <td>The University of Texas at Austin</td>
+      <td>cnrs, university of bordeaux</td>
+      <td>{'10.7554': 1}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/05r1mzq61</td>
+      <td>1</td>
+      <td>Zhuhai Institute of Advanced Technology</td>
+      <td>zhuhai college of science and technology</td>
+      <td>{'10.1075': 1}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/047s2c258</td>
+      <td>1</td>
+      <td>University of Maryland, College Park</td>
+      <td>university of maryland school of medicine</td>
       <td>{'10.7554': 1}</td>
     </tr>
     <tr>
       <td>https://ror.org/01hxy9878</td>
       <td>1</td>
-      <td>https://ror.org/01hxy9878</td>
       <td>Royal College of Surgeons in Ireland</td>
-      <td>[beaumont hospital, dublin, ireland]</td>
+      <td>beaumont hospital, dublin, ireland</td>
       <td>{'10.56305': 1}</td>
     </tr>
     <tr>
-      <td>https://ror.org/05ar8rn06</td>
+      <td>https://ror.org/04esvpn06</td>
       <td>1</td>
-      <td>https://ror.org/05ar8rn06</td>
-      <td>Guangzhou University</td>
-      <td>[guangdong university of foreign studies]</td>
-      <td>{'10.1075': 1}</td>
+      <td>Virginia State University</td>
+      <td>virginia polytechnic institute and state university</td>
+      <td>{'10.7554': 1}</td>
     </tr>
     <tr>
       <td>https://ror.org/04v4g9h31</td>
       <td>1</td>
-      <td>https://ror.org/04v4g9h31</td>
       <td>University of Thessaly</td>
-      <td>[fysiotek spine and sports lab athens, greece]</td>
+      <td>fysiotek spine and sports lab athens, greece</td>
       <td>{'10.26603': 1}</td>
     </tr>
     <tr>
-      <td>https://ror.org/05megwx07</td>
+      <td>https://ror.org/05ar8rn06</td>
       <td>1</td>
-      <td>https://ror.org/05megwx07</td>
-      <td>Southern California Orthopedic Institute</td>
-      <td>[san francisco orthopaedic residency program]</td>
-      <td>{'10.51894': 1}</td>
+      <td>Guangzhou University</td>
+      <td>guangdong university of foreign studies</td>
+      <td>{'10.1075': 1}</td>
     </tr>
     <tr>
-      <td>https://ror.org/01zcpa714</td>
+      <td>https://ror.org/04q42nz13</td>
       <td>1</td>
-      <td>https://ror.org/01zcpa714</td>
-      <td>Michigan Medicine</td>
-      <td>[university of michigan 1 department of pharmacology, , ann arbor, mi, usa]</td>
-      <td>{'10.1083': 1}</td>
+      <td>Institute of Cognitive Neuroscience and Psychology</td>
+      <td>mta pszichologiai kutatointezet</td>
+      <td>{'10.14232': 1}</td>
+    </tr>
+    <tr>
+      <td>https://ror.org/04skqfp25</td>
+      <td>1</td>
+      <td>St. Michael's Hospital</td>
+      <td>critical care medicine, department of medicine, faculty of medicine, chulalongkorn university</td>
+      <td>{'10.29390': 1}</td>
     </tr>
     <tr>
       <td>https://ror.org/04wcf8366</td>
       <td>1</td>
-      <td>https://ror.org/04wcf8366</td>
       <td>Georgia Department of Public Health</td>
-      <td>[department of environmental health, harvard t.h. chan school of public health, boston, massachusetts, usa]</td>
+      <td>department of environmental health, harvard t.h. chan school of public health, boston, massachusetts, usa</td>
       <td>{'10.32866': 1}</td>
     </tr>
     <tr>
-      <td>https://ror.org/02jzt6t86</td>
-      <td>1</td>
-      <td>https://ror.org/02jzt6t86</td>
-      <td>Institute of Human Genetics</td>
-      <td>[institut de genetique humaine]</td>
-      <td>{'10.26508': 1}</td>
-    </tr>
-    <tr>
       <td>https://ror.org/02f5b7n18</td>
       <td>1</td>
-      <td>https://ror.org/02f5b7n18</td>
       <td>Max Planck Institute for Chemistry</td>
-      <td>[max planck institute for biochemistry]</td>
+      <td>max planck institute for biochemistry</td>
       <td>{'10.7554': 1}</td>
     </tr>
   </tbody>
