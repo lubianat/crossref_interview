@@ -4,7 +4,6 @@ from tqdm import tqdm
 import pandas as pd
 import requests
 import numpy as np
-
 import json
 from datetime import datetime
 from typing import List
@@ -13,6 +12,8 @@ from urllib.parse import quote
 import time
 import helper as helper
 
+import plotly.express as px
+
 import os
 from dotenv import load_dotenv
 
@@ -20,12 +21,8 @@ load_dotenv()
 # Please install OpenAI SDK first: `pip3 install openai`
 
 from openai import OpenAI
-import tiktoken
 
 DEEP_SEEK_API_KEY = os.getenv("DEEP_SEEK_API_KEY")
-
-client = OpenAI(api_key=DEEP_SEEK_API_KEY, base_url="https://api.deepseek.com")
-
 HERE = Path(__file__).parent
 DATA = HERE / "data"
 PARALLEL_PROCESSING = False
@@ -37,6 +34,7 @@ current_month = datetime.now().strftime("%Y-%m")
 # Define the cache file paths
 ror_cache_file_path = DATA / f"ror_cache_{current_month}.json"
 marple_cache_file_path = DATA / f"marple_cache_{current_month}.json"
+
 
 # Load the ROR cache from the JSON file if it exists
 if ror_cache_file_path.exists():
@@ -58,9 +56,7 @@ def main():
         DATA.joinpath("crossref_ror_ids_with_affiliation_strings.csv")
     )
     ror_registry_df = pd.read_csv(DATA.joinpath("ror_registry_slim.csv"))
-    # Check which display names have a "/"
     ror_registry_dict = ror_registry_df.set_index("id").to_dict(orient="index")
-
     wikidata_ror_dataset = pd.read_csv(DATA.joinpath("wikidata_ror_dataset.csv"))
     wikidata_ror_dict = wikidata_ror_dataset.set_index("ROR_ID").to_dict(orient="index")
 
@@ -72,8 +68,258 @@ def main():
         wikidata_ror_dict=wikidata_ror_dict,
     )
 
-    # Get a dataset including unique strings and the ROR Display Names for all "no match" rows
+    update_match_type_with_deepseek(crossref_df, ror_registry_dict)
 
+    # Filter df by no-match and save
+    no_match_df = crossref_df[crossref_df["match_type"] == "no match"]
+    no_match_df.to_csv(
+        DATA.joinpath("crossref_ror_ids_with_affiliation_strings_and_no_matches.tsv"),
+        sep="\t",
+        index=False,
+    )
+    # Overall match summary
+    match_summary = crossref_df["match_type"].value_counts().reset_index()
+    match_summary.columns = ["match_type", "count"]
+    match_summary_html = match_summary.to_html(index=False)
+
+    # Count the number of "no-match" per ror, show ordered list of ror_ids with the most no-matches
+    # Include ror_display names, links, prepare for use datatable.js
+
+    no_match_counts = no_match_df["ROR_ID"].value_counts().reset_index()
+    no_match_counts.columns = ["ROR_ID", "no_match_count"]
+    no_match_counts = no_match_counts.merge(
+        ror_registry_df[["id", "names.types.ror_display"]],
+        left_on="ROR_ID",
+        right_on="id",
+    )
+    no_match_counts = no_match_counts.sort_values("no_match_count", ascending=False)
+
+    # Add a new column showing the unique strings provided as "name" in crossref
+    unique_names = (
+        no_match_df.groupby("ROR_ID")["normalized_name"].unique().reset_index()
+    )
+    unique_names.columns = ["ROR_ID", "unique_names"]
+
+    # Convert the list of unique names to a "|" separated string
+    unique_names["unique_names"] = unique_names["unique_names"].apply(
+        lambda x: " | ".join(x)
+    )
+
+    # Merge the result back to no_match_counts
+    no_match_counts = no_match_counts.merge(unique_names, on="ROR_ID")
+    unique_prefixes = (
+        no_match_df["DOI"]
+        .apply(lambda x: x.split("/")[0])
+        .groupby(no_match_df["ROR_ID"])
+        .unique()
+        .reset_index()
+    )
+    unique_prefixes.columns = ["ROR_ID", "unique_prefixes"]
+
+    # Now, for each prefix, calculate the number of envolved unique DOIs.
+    prefixes_df = no_match_df.assign(
+        prefix=no_match_df["DOI"].apply(lambda x: x.split("/")[0])
+    )
+    prefix_counts = (
+        prefixes_df.groupby(["ROR_ID", "prefix"])["DOI"]
+        .nunique()
+        .reset_index()
+        .groupby("ROR_ID")
+        .apply(lambda x: dict(zip(x["prefix"], x["DOI"])))
+        .reset_index()
+        .rename(columns={0: "prefix_counts"})
+    )
+
+    # Finally, for these prefixes we will query the crossref api and get the member name-> ["message"]["name"]
+    # The information will also be cached
+    # The result will be a dictionary with the prefix as key and the member name as value
+
+    prefix_to_name = {}
+
+    for prefix in tqdm(unique_prefixes["unique_prefixes"].explode().unique()):
+        if prefix not in prefix_to_name:
+            prefix_to_name[prefix] = get_member_name_from_prefix(prefix)
+    # Now add a column for member counts
+    prefix_counts["member_counts"] = prefix_counts["prefix_counts"].apply(
+        lambda x: {prefix: prefix_to_name.get(prefix, "Not found") for prefix in x}
+    )
+
+    no_match_counts = no_match_counts.merge(prefix_counts, on="ROR_ID").drop(
+        columns="id"
+    )
+    no_match_count_summary_html = no_match_counts.to_html(index=False)
+
+    # Calculate the total DOIs involved for each prefix
+    prefix_doi_counts = (
+        prefixes_df.groupby("prefix")["DOI"]
+        .nunique()
+        .reset_index()
+        .rename(columns={"DOI": "total_dois"})
+    )
+
+    # Calculate the total different strings involved for each prefix
+    prefix_string_counts = (
+        prefixes_df.groupby("prefix")["normalized_name"]
+        .nunique()
+        .reset_index()
+        .rename(columns={"normalized_name": "total_strings"})
+    )
+
+    # Merge the two tables
+    problematic_prefixes = prefix_doi_counts.merge(prefix_string_counts, on="prefix")
+
+    # Sort by total DOIs and total strings
+    problematic_prefixes = problematic_prefixes.sort_values(
+        ["total_dois", "total_strings"], ascending=False
+    )
+
+    # Add names
+    problematic_prefixes["member_names"] = problematic_prefixes["prefix"].apply(
+        lambda x: prefix_to_name.get(x, "Not found")
+    )
+
+    # For each prefix, calculate the proportion of DOIs in the original table
+    #  and the "no-match" table that it represents
+
+    # Calculate the total DOIs in the original table
+    all_dois = crossref_df["DOI"]
+    all_unmatched_dois = no_match_df["DOI"]
+    total_dois = all_dois.nunique()
+    total_unmatched_dois = all_unmatched_dois.nunique()
+
+    # Calculate the proportion of DOIs in the original table
+    problematic_prefixes["proportion_original"] = problematic_prefixes["prefix"].apply(
+        lambda x: all_dois.str.startswith(x).sum() / total_dois
+    )
+
+    # Calculate the proportion of DOIs in the "no-match" table
+    problematic_prefixes["proportion_no_match"] = problematic_prefixes["prefix"].apply(
+        lambda x: all_unmatched_dois.str.startswith(x).sum() / total_unmatched_dois
+    )
+
+    # Calculate the proportion growth from the original table to the "no-match" table
+    problematic_prefixes["proportion_ratio"] = (
+        problematic_prefixes["proportion_no_match"]
+        / problematic_prefixes["proportion_original"]
+    )
+
+    # Convert to HTML
+    problematic_prefixes_html = problematic_prefixes.to_html(index=False)
+
+    # Create an HTML file showing the decision tree for the matching process
+    decision_tree_html = """
+    <h2>Decision Pipeline for ROR Matching</h2>
+    <p>Matching is done in the following order (normalizing names):</p>
+    <ol>
+        <li>Try and match the provided name to the ROR display name, labels, aliases and acronyms (aka "ROR strings").</li>
+        <li>If not, check if one of ROR strings is a substring of the provided name (comma-separated, space separated or just substring). <li>
+        <li>If not, check if provided name is a substring of the ROR strings </li>
+        <li>If not, check if the provided name is a substring of Wikidata labels/aliases</li>
+        <li>If not, check if the provided name is retrieved by the ROR affiliation matching API (any position)</li>
+        <li>If not, check if the provided name-ROR pair matches the manual medical school mappings</li>
+        <li>If not, check if the ROR status is "withdrawn"</li>
+        <li>If not, check if the provided name is retrieved by the Marple service (single-search)</li>
+        <li>If not, check if DeepSeekV3 considers it a match</li>
+
+           </ol>
+    """
+
+    # Now create a summarized match table that aggregates the counts for the groups in the decision pipeline
+    # It should group the different groups in the categories described in the decision tree
+    # Use the names in the selection function as a guide
+
+    # Apply the mapping to match_summary_clean
+    match_summary_clean = crossref_df["match_type"].value_counts().reset_index()
+    match_summary_clean.columns = ["match_type", "count"]
+    match_summary_clean["category"] = match_summary_clean["match_type"].apply(
+        map_match_type_to_category
+    )
+
+    # Group by category and sum the counts
+    match_summary_clean = (
+        match_summary_clean.groupby("category")["count"].sum().reset_index()
+    )
+
+    # Sort by count
+    match_summary_clean = match_summary_clean.sort_values("count", ascending=False)
+    match_summary_clean_html = match_summary_clean.to_html(index=False)
+
+    # Apply the mapping to crossref_df and save
+    crossref_df["match_category"] = crossref_df["match_type"].apply(
+        map_match_type_to_category
+    )
+
+    crossref_df.to_csv(
+        DATA.joinpath("crossref_ror_ids_with_affiliation_strings_and_matches.tsv"),
+        sep="\t",
+        index=False,
+    )
+
+    # Define the HTML template with DataTables.js and jQuery
+    html_template = """
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>ROR Matching Analysis</title>
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+        <script>
+            $(document).ready(function() {{
+                $('table').DataTable({{
+                    "pageLength": 5
+                }});
+            }});
+        </script>
+    </head>
+    <body>
+        {content}
+    </body>
+    </html>
+    """
+
+    # Generate the HTML content combining the above plots and tables
+    html_parts = []
+    html_parts.append(decision_tree_html)
+
+    html_parts.append("<h2>Match Summary (grouped)</h2>")
+    html_parts.append("<p>Note: greedy matching algorithm</p>")
+    html_parts.append(match_summary_clean_html)
+
+    # Now a pizza plot for the different groups
+    fig = px.pie(
+        match_summary_clean,
+        values="count",
+        names="category",
+        title="Match Summary (grouped)",
+    )
+
+    figure_html = fig.to_html(full_html=False)
+    html_parts.append(figure_html)
+
+    html_parts.append("<h2>Match Summary (complete)</h2>")
+    html_parts.append("<p>Note: greedy matching algorithm</p>")
+
+    html_parts.append(match_summary_html)
+    html_parts.append("<h2>No Match Counts</h2>")
+    html_parts.append(no_match_count_summary_html)
+
+    # Add the missing plots
+    html_parts.append("<h2>Problematic Prefixes</h2>")
+    html_parts.append(problematic_prefixes_html)
+
+    html_content = "\n".join(html_parts)
+    # Combine the HTML template with the content
+    html_output = html_template.format(content=html_content)
+
+    # Write the HTML output to a file
+    with open(OUTPUT.joinpath("ror_matching_analysis.html"), "w") as f:
+        f.write(html_output)
+
+
+def update_match_type_with_deepseek(crossref_df, ror_registry_dict):
     entries_without_a_match_for_processing_with_deepseek = get_entries_witout_a_match(
         crossref_df, ror_registry_dict
     )
@@ -138,196 +384,7 @@ def main():
         if key in llm_match_dict and llm_match_dict[key] == True:
             crossref_df.at[i, "match_type"] = "deepseek-v3 match"
 
-    crossref_df.to_csv(
-        DATA.joinpath("crossref_ror_ids_with_affiliation_strings_and_matches.tsv"),
-        sep="\t",
-        index=False,
-    )
-
-    # Filter df by no-match and save
-    no_match_df = crossref_df[crossref_df["match_type"] == "no match"]
-    no_match_df.to_csv(
-        DATA.joinpath("crossref_ror_ids_with_affiliation_strings_and_no_matches.tsv"),
-        sep="\t",
-        index=False,
-    )
-    # Overall match summary
-    match_summary = crossref_df["match_type"].value_counts().reset_index()
-    match_summary.columns = ["match_type", "count"]
-    match_summary_html = match_summary.to_html(index=False)
-
-    # Count the number of "no-match" per ror, show ordered list of ror_ids with the most no-matches
-    # Include ror_display names, links, prepare for use datatable.js
-
-    no_match_counts = no_match_df["ROR_ID"].value_counts().reset_index()
-    no_match_counts.columns = ["ROR_ID", "no_match_count"]
-    no_match_counts = no_match_counts.merge(
-        ror_registry_df[["id", "names.types.ror_display"]],
-        left_on="ROR_ID",
-        right_on="id",
-    )
-    no_match_counts = no_match_counts.sort_values("no_match_count", ascending=False)
-
-    # Add a new column showing the unique strings provided as "name" in crossref
-    unique_names = (
-        no_match_df.groupby("ROR_ID")["normalized_name"].unique().reset_index()
-    )
-    unique_names.columns = ["ROR_ID", "unique_names"]
-
-    # Convert the list of unique names to a "|" separated string
-    unique_names["unique_names"] = unique_names["unique_names"].apply(
-        lambda x: " | ".join(x)
-    )
-
-    # Merge the result back to no_match_counts
-    no_match_counts = no_match_counts.merge(unique_names, on="ROR_ID")
-    unique_prefixes = (
-        no_match_df["DOI"]
-        .apply(lambda x: x.split("/")[0])
-        .groupby(no_match_df["ROR_ID"])
-        .unique()
-        .reset_index()
-    )
-    unique_prefixes.columns = ["ROR_ID", "unique_prefixes"]
-
-    # Now, for each prefix, calculate the number of envolved unique DOIs.
-    prefixes_df = no_match_df.assign(
-        prefix=no_match_df["DOI"].apply(lambda x: x.split("/")[0])
-    )
-    prefix_counts = (
-        prefixes_df.groupby(["ROR_ID", "prefix"])["DOI"]
-        .nunique()
-        .reset_index()
-        .groupby("ROR_ID")
-        .apply(lambda x: dict(zip(x["prefix"], x["DOI"])))
-        .reset_index()
-        .rename(columns={0: "prefix_counts"})
-    )
-    no_match_counts = no_match_counts.merge(prefix_counts, on="ROR_ID").drop(
-        columns="id"
-    )
-    no_match_count_summary_html = no_match_counts.to_html(index=False)
-
-    # Create an HTML file showing the decision tree for the matching process
-    decision_tree_html = """
-    <h2>Decision Pipeline for ROR Matching</h2>
-    <p>Matching is done in the following order (normalizing names):</p>
-    <ol>
-        <li>Try and match the provided name to the ROR display name, labels, aliases and acronyms (aka "ROR strings").</li>
-        <li>If not, check if one of ROR strings is a substring of the provided name (comma-separated, space separated or just substring). <li>
-        <li>If not, check if provided name is a substring of the ROR strings </li>
-        <li>If not, check if the provided name is a substring of Wikidata labels/aliases</li>
-        <li>If not, check if the provided name is retrieved by the ROR affiliation matching API (any position)</li>
-        <li>If not, check if the provided name-ROR pair matches the manual medical school mappings</li>
-        <li>If not, check if the ROR status is "withdrawn"</li>
-        <li>If not, check if the provided name is retrieved by the Marple service (single-search)</li>
-        <li>If not, check if DeepSeekV3 considers it a match</li>
-
-           </ol>
-    """
-
-    # Now create a summarized match table that aggregates the counts for the groups in the decision pipeline
-    # It should group the different groups in the categories described in the decision tree
-    # Use the names in the selection function as a guide
-
-    # Define the category mapping
-    category_mapping = {
-        "ror_display": "ror_display",
-        "label": "label",
-        "alias": "alias",
-        "acronym": "acronym",
-        "wikidata": "Wikidata match",
-        "ror affiliation endpoint": "ROR API match",
-        "medical school to university mapping": "medical school mapping",
-        "withdrawn": "withdrawn ROR",
-        "marple": "Marple match",
-    }
-
-    # Function to map match_type to category
-    def map_category(match_type):
-        for key, value in category_mapping.items():
-            if key in match_type:
-                return value
-        return match_type
-
-    # Apply the mapping to match_summary_clean
-    match_summary_clean = crossref_df["match_type"].value_counts().reset_index()
-    match_summary_clean.columns = ["match_type", "count"]
-    match_summary_clean["category"] = match_summary_clean["match_type"].apply(
-        map_category
-    )
-
-    # Group by category and sum the counts
-    match_summary_clean = (
-        match_summary_clean.groupby("category")["count"].sum().reset_index()
-    )
-
-    # Sort by count
-    match_summary_clean = match_summary_clean.sort_values("count", ascending=False)
-    match_summary_clean_html = match_summary_clean.to_html(index=False)
-
-    # Apply the mapping to crossref_df and save
-    crossref_df["match_category"] = crossref_df["match_type"].apply(map_category)
-
-    crossref_df.to_csv(
-        DATA.joinpath("crossref_ror_ids_with_affiliation_strings_and_matches.tsv"),
-        sep="\t",
-        index=False,
-    )
-
-    # Now let's add a counter for the unique _strings_ in each category
-    unique_strings_per_category = (
-        no_match_df.groupby("match_type")["normalized_name"].nunique().reset_index()
-    )
-    unique_strings_per_category.columns = ["category", "unique_strings"]
-    unique_strings_per_category = unique_strings_per_category.sort_values(
-        "unique_strings", ascending=False
-    )
-
-    unique_strings_per_category_html = unique_strings_per_category.to_html(index=False)
-
-    # Define the HTML template with DataTables.js and jQuery
-    html_template = """
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>ROR Matching Analysis</title>
-        <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
-        <script>
-            $(document).ready(function() {
-                $('table').DataTable();
-            });
-        </script>
-    </head>
-    <body>
-        {content}
-    </body>
-    </html>
-    """
-
-    # Generate the HTML content combining the above plots and tables
-    html_parts = []
-    html_parts.append(decision_tree_html)
-    html_parts.append("<h2>Match Summary (grouped)</h2>")
-    html_parts.append(match_summary_clean_html)
-    html_parts.append("<h2>Unique Strings per Category</h2>")
-    html_parts.append(unique_strings_per_category_html)
-    html_parts.append("<h2>Match Summary (complete)</h2>")
-    html_parts.append(match_summary_html)
-    html_parts.append("<h2>No Match Counts</h2>")
-    html_parts.append(no_match_count_summary_html)
-    html_content = "\n".join(html_parts)
-
-    # Combine the HTML template with the content
-    html_output = html_template.format(content=html_content)
-
-    # Write the HTML output to a file
-    with open(OUTPUT.joinpath("ror_matching_analysis.html"), "w") as f:
-        f.write(html_output)
+    return crossref_df
 
 
 def get_entries_witout_a_match(crossref_df, ror_registry_dict):
@@ -604,6 +661,8 @@ OUTPUT:
 ]
 }
 """
+    client = OpenAI(api_key=DEEP_SEEK_API_KEY, base_url="https://api.deepseek.com")
+
     response = client.chat.completions.create(
         model="deepseek-chat",
         messages=[
@@ -708,6 +767,54 @@ def get_ror_api_candidates_for_affiliation(
     save_ror_cache()
     time.sleep(0.5)
     return result_ror_ids
+
+
+# Function to map match_type to category
+def map_match_type_to_category(match_type):
+    # Define the category mapping
+    category_mapping = {
+        "ror_display": "ror_display",
+        "label": "label",
+        "alias": "alias",
+        "acronym": "acronym",
+        "wikidata": "Wikidata match",
+        "ror affiliation endpoint": "ROR API match",
+        "medical school to university mapping": "medical school mapping",
+        "withdrawn": "withdrawn ROR",
+        "marple": "Marple match",
+    }
+    for key, value in category_mapping.items():
+        if key in match_type:
+            return value
+    return match_type
+
+
+def get_member_name_from_prefix(prefix):
+    prefix_cache_file_path = DATA / f"prefix_cache_{current_month}.json"
+    if prefix_cache_file_path.exists():
+        with prefix_cache_file_path.open("r") as f:
+            prefix_cache = json.load(f)
+    else:
+        prefix_cache = {}
+
+    if prefix in prefix_cache:
+        return prefix_cache[prefix]
+
+    url = f"https://api.crossref.org/prefixes/{prefix}"
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        try:
+            member_name = data["message"]["name"]
+        except KeyError:
+            member_name = "Not found"
+    else:
+        member_name = "Not found"
+
+    prefix_cache[prefix] = member_name
+    with prefix_cache_file_path.open("w") as f:
+        json.dump(prefix_cache, f, indent=4, sort_keys=True)
+    return member_name
 
 
 if __name__ == "__main__":
