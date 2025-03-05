@@ -3,3 +3,4 @@ problem_1/
 problem_2/data/*
 problem_2/src/data/*cache_directory/
 problem_2/src/data/
+.env
