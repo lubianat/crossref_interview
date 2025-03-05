@@ -14,7 +14,7 @@ PARALLEL_PROCESSING = False
 
 def main():
     # -------------------------------
-    # Part 1: Analysis of Crossref Data
+    # Part 1: Exploratory Analysis of Crossref Data
     # -------------------------------
 
     input_file = DATA / "crossref_affiliation_ids.csv"
@@ -24,10 +24,8 @@ def main():
     # Save intermediate file 01
     crossref_df.to_csv(DATA.joinpath("crossref_ror_ids.csv"), index=False)
 
-    # Original Metrics
     unique_rors = crossref_df["ROR_ID"].dropna().unique()
     total_unique_rors = len(unique_rors)
-
     crossref_df["DOI_Prefix"] = crossref_df["DOI"].str.split("/").str[0]
 
     group_member = (
@@ -85,9 +83,6 @@ def main():
     proportion_containing_affiliation_string = 1 - (
         no_affiliation_string.sum() / len(crossref_df)
     )
-
-    print(proportion_containing_affiliation_string)
-    print(proportion_missing_affiliation_string)
 
     # Save intermediate file 02 containing only files with affiliation strings
     crossref_df = crossref_df[~no_affiliation_string]

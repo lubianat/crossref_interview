@@ -7,6 +7,10 @@ import logging
 from typing import Optional, List, Dict, Tuple
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from tqdm import tqdm
+from pathlib import Path
+
+HERE = Path(__file__).parent
+DATA = HERE / "data"
 
 
 def setup_logging():
@@ -150,11 +154,9 @@ def main():
     setup_logging()
     logging.info("Starting Crossref ROR extraction process with parallel processing.")
 
-    data_dir = (
-        "/home/lubianat/Documents/random/crossref_data_exploration/problem_2/data"
-    )
+    data_dir = DATA / "crossref_raw_data"
     output_csv = "crossref_affiliation_ids.csv"
-    processed_files_log = "processed_files.txt"
+    processed_files_log = DATA / "crossref_processed_files.txt"
 
     if not os.path.isdir(data_dir):
         logging.error(f"Data directory does not exist: {data_dir}")

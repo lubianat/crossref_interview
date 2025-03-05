@@ -10,6 +10,7 @@ from typing import List
 import logging
 from urllib.parse import quote
 import time
+import helper as helper
 
 HERE = Path(__file__).parent
 DATA = HERE / "data"
@@ -200,6 +201,62 @@ def main():
                     + f" ({api_match_type})"
                 )
 
+        if match_type == "no match":
+            # check status for ror status
+            ror_status = ror_data.get("status", "")
+            if ror_status == "withdrawn":
+                match_type = "no match (withdrawn ror)"
+
+        ror_to_medical_school_mappings = {
+            "https://ror.org/03vek6s52": [
+                "Harvard T.H. Chan School of Public Health",
+                "harvard t h chan school of public health",
+                "harvard th chan school of public health",
+                "Harvard Medical School",
+            ],
+            "https://ror.org/01yc7t268": ["Washington University School of Medicine"],
+            "https://ror.org/036c27j91": [
+                "washington university school of medicine"
+            ],  # Also weird, two rors, same string
+            "https://ror.org/0107w4315": [
+                "University of Colorado Medical School"
+            ],  # Actually ROR for  University of Colorado Health
+            "https://ror.org/03v76x132": [
+                "Yale School of Medicine",
+                "yale school of public health",
+            ],
+            "https://ror.org/04rq5mt64": ["university of maryland school of medicine"],
+            "https://ror.org/03wmf1y16": ["university of colorado school of medicine"],
+            "https://ror.org/0202bj006": [
+                "shengjing hospital of china medical university"
+            ],  # ROR for parent hostpital
+            "https://ror.org/03gds6c39": ["mcgovern medical school"],
+            "https://ror.org/04vmvtb21": ["tulane school of medicine"],
+            "https://ror.org/049s0rh22": ["geisel school of medicine at dartmouth"],
+            "https://ror.org/00jmfr291": ["university of michigan medical school"],
+        }
+
+        # normalize ror_to_medical_school_mappings using helper.normalize_strings
+        ror_to_medical_school_mappings = {
+            helper.normalize_string(k): [helper.normalize_string(v) for v in vs]
+            for k, vs in ror_to_medical_school_mappings.items()
+        }
+
+        if match_type == "no match":
+            medical_schools = ror_to_medical_school_mappings.get(ror_id, [])
+            if len(medical_schools) != 0:
+
+                if affiliation_name in medical_schools:
+                    match_type = "medical school to university mapping"
+                elif any(
+                    medical_school in affiliation_name
+                    for medical_school in medical_schools
+                ):
+                    match_type = "medical school to university mapping (substring)"
+
+        if match_type == "no match" and ror_id == "https://ror.org/04qw24q55":
+            match_type = "no match (special case, Wageningen University)"
+
         return match_type
 
     tqdm.pandas()
@@ -240,10 +297,48 @@ def main():
     )
     no_match_counts = no_match_counts.sort_values("no_match_count", ascending=False)
 
-    no_match_count_summary_html = no_match_counts.to_html(index=False)
+    # Add a new column showing the unique strings provided as "name" in crossref
+    unique_names = (
+        no_match_df.groupby("ROR_ID")["normalized_name"].unique().reset_index()
+    )
+    unique_names.columns = ["ROR_ID", "unique_names"]
+    no_match_counts = no_match_counts.merge(unique_names, on="ROR_ID")
 
-    # Research hypothesis: are dois that have one "no-match" more likely to have a second "no-match"?
-    # In other words, is there an association between individual DOIs and having a "no-match" — my guess is yes.
+    # No, add a new column showing the unique doi prefixes (before first /) for each un-matched ROR.
+
+    unique_prefixes = (
+        no_match_df["DOI"]
+        .apply(lambda x: x.split("/")[0])
+        .groupby(no_match_df["ROR_ID"])
+        .unique()
+        .reset_index()
+    )
+    unique_prefixes.columns = ["ROR_ID", "unique_prefixes"]
+    # no_match_counts = no_match_counts.merge(unique_prefixes, on="ROR_ID")
+
+    # Now, for each prefix, calculate the number of envolved unique DOIs.
+    # Instead of a list, display it as a dict of "prefix": count
+    # Create a DataFrame with prefixes and ROR_ID
+
+    prefixes_df = no_match_df.assign(
+        prefix=no_match_df["DOI"].apply(lambda x: x.split("/")[0])
+    )
+
+    # Group by ROR_ID and prefix, then count unique DOIs
+    prefix_counts = (
+        prefixes_df.groupby(["ROR_ID", "prefix"])["DOI"]
+        .nunique()
+        .reset_index()
+        .groupby("ROR_ID")
+        .apply(lambda x: dict(zip(x["prefix"], x["DOI"])))
+        .reset_index()
+        .rename(columns={0: "prefix_counts"})
+    )
+
+    # Merge the result back to no_match_counts
+    no_match_counts = no_match_counts.merge(prefix_counts, on="ROR_ID")
+
+    no_match_count_summary_html = no_match_counts.to_html(index=False)
 
     # Create an HTML file showing the decision tree for the matching process
     decision_tree_html = """

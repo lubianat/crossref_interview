@@ -25,6 +25,7 @@ def main():
             "names.types.ror_display",
             "relationships",
             "external_ids.type.wikidata.all",
+            "status",
         ]
     ]
     # Add normalized
