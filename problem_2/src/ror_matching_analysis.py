@@ -71,8 +71,8 @@ def main():
     update_match_type_with_deepseek(crossref_df, ror_registry_dict)
 
     # Filter df by no-match and save
-    no_match_df = crossref_df[crossref_df["match_type"] == "no match"]
-    no_match_df.to_csv(
+    no_match_without_special_df = crossref_df[crossref_df["match_type"] == "no match"]
+    no_match_without_special_df.to_csv(
         DATA.joinpath("crossref_ror_ids_with_affiliation_strings_and_no_matches.tsv"),
         sep="\t",
         index=False,
@@ -85,69 +85,28 @@ def main():
     # Count the number of "no-match" per ror, show ordered list of ror_ids with the most no-matches
     # Include ror_display names, links, prepare for use datatable.js
 
-    no_match_counts = no_match_df["ROR_ID"].value_counts().reset_index()
-    no_match_counts.columns = ["ROR_ID", "no_match_count"]
-    no_match_counts = no_match_counts.merge(
-        ror_registry_df[["id", "names.types.ror_display"]],
-        left_on="ROR_ID",
-        right_on="id",
-    )
-    no_match_counts = no_match_counts.sort_values("no_match_count", ascending=False)
-
-    # Add a new column showing the unique strings provided as "name" in crossref
-    unique_names = (
-        no_match_df.groupby("ROR_ID")["normalized_name"].unique().reset_index()
-    )
-    unique_names.columns = ["ROR_ID", "unique_names"]
-
-    # Convert the list of unique names to a "|" separated string
-    unique_names["unique_names"] = unique_names["unique_names"].apply(
-        lambda x: " | ".join(x)
+    _, _, no_match_count_summary_html = parse_no_match_df(
+        ror_registry_df, no_match_without_special_df
     )
 
-    # Merge the result back to no_match_counts
-    no_match_counts = no_match_counts.merge(unique_names, on="ROR_ID")
-    unique_prefixes = (
-        no_match_df["DOI"]
-        .apply(lambda x: x.split("/")[0])
-        .groupby(no_match_df["ROR_ID"])
-        .unique()
-        .reset_index()
-    )
-    unique_prefixes.columns = ["ROR_ID", "unique_prefixes"]
+    no_match_count_with_all_cases_df = crossref_df[
+        crossref_df["match_type"].str.contains("no match")
+    ]
 
-    # Now, for each prefix, calculate the number of envolved unique DOIs.
-    prefixes_df = no_match_df.assign(
-        prefix=no_match_df["DOI"].apply(lambda x: x.split("/")[0])
-    )
-    prefix_counts = (
-        prefixes_df.groupby(["ROR_ID", "prefix"])["DOI"]
-        .nunique()
-        .reset_index()
-        .groupby("ROR_ID")
-        .apply(lambda x: dict(zip(x["prefix"], x["DOI"])))
-        .reset_index()
-        .rename(columns={0: "prefix_counts"})
+    # Exclude the non-special cases (i.e. the ones in the no_match_df table)
+    no_match_count_with_just_special_cases_df = no_match_count_with_all_cases_df[
+        ~no_match_count_with_all_cases_df["ROR_ID"].isin(
+            no_match_without_special_df["ROR_ID"]
+        )
+    ]
+
+    _, _, no_match_special_cases_count_summary_html = parse_no_match_df(
+        ror_registry_df, no_match_count_with_just_special_cases_df
     )
 
-    # Finally, for these prefixes we will query the crossref api and get the member name-> ["message"]["name"]
-    # The information will also be cached
-    # The result will be a dictionary with the prefix as key and the member name as value
-
-    prefix_to_name = {}
-
-    for prefix in tqdm(unique_prefixes["unique_prefixes"].explode().unique()):
-        if prefix not in prefix_to_name:
-            prefix_to_name[prefix] = get_member_name_from_prefix(prefix)
-    # Now add a column for member counts
-    prefix_counts["member_counts"] = prefix_counts["prefix_counts"].apply(
-        lambda x: {prefix: prefix_to_name.get(prefix, "Not found") for prefix in x}
+    prefixes_df, prefix_to_name, _ = parse_no_match_df(
+        ror_registry_df, no_match_count_with_all_cases_df
     )
-
-    no_match_counts = no_match_counts.merge(prefix_counts, on="ROR_ID").drop(
-        columns="id"
-    )
-    no_match_count_summary_html = no_match_counts.to_html(index=False)
 
     # Calculate the total DOIs involved for each prefix
     prefix_doi_counts = (
@@ -165,7 +124,8 @@ def main():
         .rename(columns={"normalized_name": "total_strings"})
     )
 
-    # Merge the two tables
+    # Problematic prefix analysis: for this, bring back the special cases "no match"
+
     problematic_prefixes = prefix_doi_counts.merge(prefix_string_counts, on="prefix")
 
     # Sort by total DOIs and total strings
@@ -183,7 +143,7 @@ def main():
 
     # Calculate the total DOIs in the original table
     all_dois = crossref_df["DOI"]
-    all_unmatched_dois = no_match_df["DOI"]
+    all_unmatched_dois = no_match_count_with_all_cases_df["DOI"]
     total_dois = all_dois.nunique()
     total_unmatched_dois = all_unmatched_dois.nunique()
 
@@ -203,8 +163,64 @@ def main():
         / problematic_prefixes["proportion_original"]
     )
 
+    # Calculate the proportion of DOIs for this prefix that are problematic
+    problematic_prefixes["percentage_unmatched"] = problematic_prefixes["prefix"].apply(
+        lambda x: all_unmatched_dois.str.startswith(x).sum()
+        / all_dois.str.startswith(x).sum()
+        * 100
+    )
+
     # Convert to HTML
     problematic_prefixes_html = problematic_prefixes.to_html(index=False)
+
+    # Now let's plot the top 10 problematic prefixes
+
+    problematic_prefixes = problematic_prefixes.sort_values(
+        "percentage_unmatched", ascending=False
+    )
+    fig = px.bar(
+        problematic_prefixes.head(10),
+        x="member_names",
+        y="percentage_unmatched",
+        title="Top 15 problematic prefixes (normalized by submissions)",
+        labels={
+            "member_names": "Member Names",
+            "percentage_unmatched": "Percentage unmatched",
+        },
+        hover_data={"prefix": True, "total_dois": True, "total_strings": True},
+    )
+
+    # Save the plot as HTML
+    problematic_prefixes_plot_html = fig.to_html(full_html=False)
+
+    total_entries_with_ror_ids_path = DATA / "crossref_ror_ids.csv"
+
+    crude_df = pd.read_csv(total_entries_with_ror_ids_path)
+
+    rors_without_affiliation_name = crude_df[  # RORs without an affiliation name
+        crude_df["Affiliation_Name"].isnull()
+    ]["ROR_ID"]
+
+    total_rors_with_affiliation_name = crossref_df["ROR_ID"]
+    total_dois_with_ror_and_affiliation_name = crossref_df["DOI"]
+
+    summary_html = f"""
+
+    CrossRef Dataset: complete dump, april 2024
+    ROR Dump version: v1.59-2025-01-23 
+
+    API queries, when used, were made to the live ROR and CrossRef (Marple) APIs.
+
+    <h2>Baseline Numbers</h2>
+    <ul>
+        <li><strong>Total entries with ROR IDs but no affiliation name:</strong> {rors_without_affiliation_name.shape[0]}</li>
+        <li><strong>Total entries  with ROR IDs and affiliation name:</strong> {total_rors_with_affiliation_name.shape[0]}</li>
+
+        <li><strong>Unique ROR IDs without an affiliation name:</strong> {rors_without_affiliation_name.nunique()}</li>
+        <li><strong>Unique ROR IDs with an affiliation name:</strong> {total_rors_with_affiliation_name.nunique()}</li>
+        <li><strong>Total DOIs with an ROR ID and an affiliation name:</strong> {total_dois_with_ror_and_affiliation_name.nunique()}</li>
+    </ul>
+    """
 
     # Create an HTML file showing the decision tree for the matching process
     decision_tree_html = """
@@ -212,12 +228,13 @@ def main():
     <p>Matching is done in the following order (normalizing names):</p>
     <ol>
         <li>Try and match the provided name to the ROR display name, labels, aliases and acronyms (aka "ROR strings").</li>
-        <li>If not, check if one of ROR strings is a substring of the provided name (comma-separated, space separated or just substring). <li>
+        <li>If not, check if one of ROR strings is a substring of the provided name (comma-separated, space separated or just substring). </li>
         <li>If not, check if provided name is a substring of the ROR strings </li>
         <li>If not, check if the provided name is a substring of Wikidata labels/aliases</li>
         <li>If not, check if the provided name is retrieved by the ROR affiliation matching API (any position)</li>
         <li>If not, check if the provided name-ROR pair matches the manual medical school mappings</li>
         <li>If not, check if the ROR status is "withdrawn"</li>
+        <li>If not, check if it matches one of the manually curated special cases </li>
         <li>If not, check if the provided name is retrieved by the Marple service (single-search)</li>
         <li>If not, check if DeepSeekV3 considers it a match</li>
 
@@ -282,6 +299,7 @@ def main():
 
     # Generate the HTML content combining the above plots and tables
     html_parts = []
+    html_parts.append(summary_html)
     html_parts.append(decision_tree_html)
 
     html_parts.append("<h2>Match Summary (grouped)</h2>")
@@ -306,9 +324,22 @@ def main():
     html_parts.append("<h2>No Match Counts</h2>")
     html_parts.append(no_match_count_summary_html)
 
+    html_parts.append("<h2>No Match Counts (all cases)</h2>")
+    html_parts.append("<h2> Includes withdwawn RORs, special cases, etc.</h2>")
+    html_parts.append(no_match_special_cases_count_summary_html)
+
+    # # Also, show each special case as its own table
+    # wageningen_df = crossref_df[
+    #     crossref_df["match_type"] == "no match (special case, Wageningen University)"
+    # ]
+    # wageningen_count_summary =
+
     # Add the missing plots
     html_parts.append("<h2>Problematic Prefixes</h2>")
     html_parts.append(problematic_prefixes_html)
+
+    html_parts.append("<h2>Top 10 Problematic Prefixes</h2>")
+    html_parts.append(problematic_prefixes_plot_html)
 
     html_content = "\n".join(html_parts)
     # Combine the HTML template with the content
@@ -317,6 +348,73 @@ def main():
     # Write the HTML output to a file
     with open(OUTPUT.joinpath("ror_matching_analysis.html"), "w") as f:
         f.write(html_output)
+
+
+def parse_no_match_df(ror_registry_df, no_match_df):
+    no_match_counts = no_match_df["ROR_ID"].value_counts().reset_index()
+    no_match_counts.columns = ["ROR_ID", "no_match_count"]
+    no_match_counts = no_match_counts.merge(
+        ror_registry_df[["id", "names.types.ror_display"]],
+        left_on="ROR_ID",
+        right_on="id",
+    )
+    no_match_counts = no_match_counts.sort_values("no_match_count", ascending=False)
+
+    # Add a new column showing the unique strings provided as "name" in crossref
+    unique_names = (
+        no_match_df.groupby("ROR_ID")["normalized_name"].unique().reset_index()
+    )
+    unique_names.columns = ["ROR_ID", "unique_names"]
+
+    # Convert the list of unique names to a "|" separated string
+    unique_names["unique_names"] = unique_names["unique_names"].apply(
+        lambda x: " | ".join(x)
+    )
+
+    # Merge the result back to no_match_counts
+    no_match_counts = no_match_counts.merge(unique_names, on="ROR_ID")
+    unique_prefixes = (
+        no_match_df["DOI"]
+        .apply(lambda x: x.split("/")[0])
+        .groupby(no_match_df["ROR_ID"])
+        .unique()
+        .reset_index()
+    )
+    unique_prefixes.columns = ["ROR_ID", "unique_prefixes"]
+
+    # Now, for each prefix, calculate the number of envolved unique DOIs.
+    prefixes_df = no_match_df.assign(
+        prefix=no_match_df["DOI"].apply(lambda x: x.split("/")[0])
+    )
+    prefix_counts = (
+        prefixes_df.groupby(["ROR_ID", "prefix"])["DOI"]
+        .nunique()
+        .reset_index()
+        .groupby("ROR_ID")
+        .apply(lambda x: dict(zip(x["prefix"], x["DOI"])))
+        .reset_index()
+        .rename(columns={0: "prefix_counts"})
+    )
+
+    # Finally, for these prefixes we will query the crossref api and get the member name-> ["message"]["name"]
+    # The information will also be cached
+    # The result will be a dictionary with the prefix as key and the member name as value
+
+    prefix_to_name = {}
+
+    for prefix in tqdm(unique_prefixes["unique_prefixes"].explode().unique()):
+        if prefix not in prefix_to_name:
+            prefix_to_name[prefix] = get_member_name_from_prefix(prefix)
+    # Now add a column for member counts
+    prefix_counts["member_counts"] = prefix_counts["prefix_counts"].apply(
+        lambda x: {prefix: prefix_to_name.get(prefix, "Not found") for prefix in x}
+    )
+
+    no_match_counts = no_match_counts.merge(prefix_counts, on="ROR_ID").drop(
+        columns="id"
+    )
+    no_match_count_summary_html = no_match_counts.to_html(index=False)
+    return prefixes_df, prefix_to_name, no_match_count_summary_html
 
 
 def update_match_type_with_deepseek(crossref_df, ror_registry_dict):
@@ -420,7 +518,7 @@ def detect_lexical_match(row, ror_registry_dict, wikidata_ror_dict):
     affiliation_name = row["normalized_name"]
 
     if ror_id not in ror_registry_dict:
-        return "ror not registered"
+        return "no match (ror not registered)"
 
     ror_data = ror_registry_dict[ror_id]
     ror_id_acronyms = extract_clean_labels(ror_data["names.types.acronym.normalized"])
