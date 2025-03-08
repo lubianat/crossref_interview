@@ -13,9 +13,10 @@ As of 2025-10-08, this analysis uses the datasets:
 
 - Wikidata, queried via QLever (https://qlever.cs.uni-freiburg.de/wikidata), Full Wikidata dump from https://dumps.wikimedia.org/wikidatawiki/entities (latest-all.ttl.bz2 and latest-lexemes.ttl.bz2, version 29.01.2025)
 
-It contains 3 html files: 
 
+The analysis are done mostly in Python with some supporting JS for viz and exploration.
 
+The HTML are available as a GitHub Pages - powered static website at https://tiago.bio.br/crossref_interview . 
 
 
 ## The problem
