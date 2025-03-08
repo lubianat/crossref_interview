@@ -26,23 +26,22 @@ DEEP_SEEK_API_KEY = os.getenv("DEEP_SEEK_API_KEY")
 HERE = Path(__file__).parent
 DATA = HERE / "data"
 PARALLEL_PROCESSING = False
-OUTPUT = HERE.parent
+OUTPUT = HERE.parent / "2024_dump_analysis"
 
 current_month = datetime.now().strftime("%Y-%m")
 ror_cache_file_path = DATA / f"ror_cache_{current_month}.json"
 marple_cache_file_path = DATA / f"marple_cache_{current_month}.json"
 
-if ror_cache_file_path.exists():
-    with ror_cache_file_path.open("r") as ror_cache_file:
-        ror_cache = json.load(ror_cache_file)
-else:
-    ror_cache = {}
 
-if marple_cache_file_path.exists():
-    with marple_cache_file_path.open("r") as marple_cache_file:
-        marple_cache = json.load(marple_cache_file)
-else:
-    marple_cache = {}
+def load_cache(file_path):
+    if file_path.exists():
+        with file_path.open("r") as cache_file:
+            return json.load(cache_file)
+    return {}
+
+
+ror_cache = load_cache(ror_cache_file_path)
+marple_cache = load_cache(marple_cache_file_path)
 
 
 def main():
@@ -78,6 +77,13 @@ def main():
     crossref_df["match_category"] = crossref_df["match_type"].apply(
         map_match_type_to_category
     )
+
+    # Enrich the dataset with the ROR display information
+
+    crossref_df["ROR_Display"] = crossref_df["ROR_ID"].apply(
+        lambda x: ror_registry_dict.get(x, {}).get("names.types.ror_display", "")
+    )
+
     crossref_df.to_csv(
         DATA.joinpath("crossref_ror_ids_with_affiliation_strings_and_matches.tsv"),
         sep="\t",

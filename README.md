@@ -1,4 +1,24 @@
-# Problem 2
+# CrossRef Data Exploration - Data Scientist interview
+
+
+This repository contains the code and analysis for Problem 2, put forth by Dominika Tkaczyk as one of the tasks in process of application for a Data Scientist position at CrossRef. 
+
+This README contains a few thoughts on the process, written before the analysis started, and kept here as a log. 
+
+As of 2025-10-08, this analysis uses the datasets:
+
+- April 2024 Public Data File from CrossRef (http://dx.doi.org/10.13003/849J5WP)
+
+- ROR Release v1.59 (https://github.com/ror-community/ror-records/releases/tag/v1.59)
+
+- Wikidata, queried via QLever (https://qlever.cs.uni-freiburg.de/wikidata), Full Wikidata dump from https://dumps.wikimedia.org/wikidatawiki/entities (latest-all.ttl.bz2 and latest-lexemes.ttl.bz2, version 29.01.2025)
+
+It contains 3 html files: 
+
+
+
+
+## The problem
  (by Dominika Tkaczyk)
 
 Context: Consider this example metadata record in the Crossref API. It represents a research output. Note the following metadata fields:

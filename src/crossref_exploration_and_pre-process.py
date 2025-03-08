@@ -435,7 +435,7 @@ def main():
     html_parts.append("</body></html>")
     report_html = "\n".join(html_parts)
 
-    output_file = HERE / "pre_exploratory_analysis_report.html"
+    output_file = HERE / "exploration" / "index.html"
     with open(output_file, "w", encoding="utf-8") as f:
         f.write(report_html)
 
