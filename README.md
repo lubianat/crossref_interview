@@ -7,12 +7,11 @@ This README contains a few thoughts on the process, written before the analysis 
 
 As of 2025-10-08, this analysis uses the datasets:
 
-- April 2024 Public Data File from CrossRef (http://dx.doi.org/10.13003/849J5WP)
+- April 2024 Public Data File from CrossRef (http://dx.doi.org/10.13003/849J5WP), downloaded via torrent to `src/data/crossref_raw_data`. 
 
-- ROR Release v1.59 (https://github.com/ror-community/ror-records/releases/tag/v1.59)
+- ROR Release v1.59 (https://github.com/ror-community/ror-records/releases/tag/v1.59), downloaded manually and added to `src/data/v1.59-2025-01-23-ror-data`.
 
 - Wikidata, queried via QLever (https://qlever.cs.uni-freiburg.de/wikidata), Full Wikidata dump from https://dumps.wikimedia.org/wikidatawiki/entities (latest-all.ttl.bz2 and latest-lexemes.ttl.bz2, version 29.01.2025)
-
 
 The analysis are done mostly in Python with some supporting JS for viz and exploration.
 

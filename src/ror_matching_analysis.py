@@ -240,25 +240,27 @@ def generate_analysis_html(crossref_df, ror_registry_df, no_match_without_specia
     total_dois_with_ror_and_affiliation_name = crossref_df["DOI"]
 
     summary_html = f"""
-
-        CrossRef Dataset: complete dump, april 2024
-        ROR Dump version: v1.59-2025-01-23 
-
-        API queries, when used, were made to the live ROR and CrossRef (Marple) APIs.
-
+    <div class="summary">
+        <h2>CrossRef Data Exploration - Data Scientist Interview</h2>
+        <p>This analysis uses the following datasets:</p>
+        <ul>
+            <li><strong>CrossRef Dataset:</strong> April 2024 Public Data File (<a href="http://dx.doi.org/10.13003/849J5WP" target="_blank">DOI: 10.13003/849J5WP</a>)</li>
+            <li><strong>ROR Dataset:</strong> ROR Release v1.59 (<a href="https://github.com/ror-community/ror-records/releases/tag/v1.59" target="_blank">GitHub Release</a>)</li>
+            <li><strong>Wikidata Dataset:</strong> Queried via QLever (<a href="https://qlever.cs.uni-freiburg.de/wikidata" target="_blank">QLever</a>), Full Wikidata dump from <a href="https://dumps.wikimedia.org/wikidatawiki/entities" target="_blank">Wikimedia</a> (version 29.01.2025)</li>
+        </ul>
         <h2>Baseline Numbers</h2>
         <ul>
-            <li><strong>Un        <li><strong>Total entries with ROR IDs and affiliation name:</strong> {total_rors_with_affiliation_name.shape[0]}</li>
-    ique ROR IDs in this set:</strong> {total_rors_with_affiliation_name.nunique()}</li>
+            <li><strong>Total entries with ROR IDs and affiliation name:</strong> {total_rors_with_affiliation_name.shape[0]}</li>
+            <li><strong>Unique ROR IDs in this set:</strong> {total_rors_with_affiliation_name.nunique()}</li>
             <li><strong>Unique DOIs in this set:</strong> {total_dois_with_ror_and_affiliation_name.nunique()}</li>
         </ul>
-        """
+    </div>
+    """
 
     # Create an HTML file showing the decision tree for the matching process
     decision_tree_html = """
         <h2>Decision Pipeline for ROR Matching</h2>
-        <img src="pipeline.svg" alt="Matching Pipeline">
-
+        <img src="pipeline.svg" alt="Matching Pipeline" class="img-fluid">
         """
 
     # Generate match summary clean
@@ -273,9 +275,11 @@ def generate_analysis_html(crossref_df, ror_registry_df, no_match_without_specia
         .reset_index()
         .sort_values("count", ascending=False)
     )
-    match_summary_clean_html = match_summary_clean.to_html(index=False)
+    match_summary_clean_html = match_summary_clean.to_html(
+        index=False, classes="table table-striped"
+    )
 
-    # Define the HTML template with DataTables.js and jQuery
+    # Define the HTML template with DataTables.js, Bootstrap, and custom CSS
     html_template = """
     <!DOCTYPE html>
     <html lang="en">
@@ -305,8 +309,35 @@ def generate_analysis_html(crossref_df, ror_registry_df, no_match_without_specia
         <style>
             body {{
                 padding: 20px;
+                background-color: #f8f9fa;
+                font-family: Arial, sans-serif;
             }}
             h2 {{
+                margin-top: 20px;
+                color: #343a40;
+            }}
+            .summary {{
+                background-color: #ffffff;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                margin-bottom: 20px;
+            }}
+            .summary ul {{
+                list-style-type: none;
+                padding: 0;
+            }}
+            .summary ul li {{
+                margin-bottom: 10px;
+            }}
+            .summary ul li a {{
+                color: #007bff;
+                text-decoration: none;
+            }}
+            .summary ul li a:hover {{
+                text-decoration: underline;
+            }}
+            .table {{
                 margin-top: 20px;
             }}
         </style>
@@ -318,7 +349,6 @@ def generate_analysis_html(crossref_df, ror_registry_df, no_match_without_specia
     </body>
     </html>
     """
-
     # Generate the HTML content combining the above plots and tables
     html_parts = []
     html_parts.append(summary_html)
