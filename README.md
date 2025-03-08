@@ -17,6 +17,9 @@ The analysis are done mostly in Python with some supporting JS for viz and explo
 
 The HTML are available as a GitHub Pages - powered static website at https://tiago.bio.br/crossref_interview . 
 
+An overview of how to run the pipeline can be seen at [./src/pipeline.sh](./src/pipeline.sh).
+
+The pipeline was tailored to run on a simple machine (512GB SSD, 16GB of RAM, 12 intel i5 cores) on Ubuntu 24.04.1 LTS, using Python 3.12.3. 
 
 ## The problem
  (by Dominika Tkaczyk)
@@ -74,7 +77,6 @@ After getting an idea of how many ids+names we have in Crossref, we could create
 
 We could use F1 scores for starters, F0.5  if the goal is batch applying to data, F2 if there is a human curation layer. 
 
-
 Communication of the findings would depend on the findings and on the audience. 
 
 For the tech team, findings may be the different scores for the methods on the test dataset, and follow classic data science viz, say, bar plots showing Precision, Recall, F1, F0.5 and F2 scores
@@ -109,7 +111,6 @@ Names in ROR might be weird or wrong too, though that is likely to be rare. Agai
    
 **Are there any interesting additional questions or paths we might want to explore?**
 
-
 I like this problem because it opens the gates to many relevant questions. Tracking affiliation is notoriously hard, and [this is likely to be relevant in practice in the near future](https://ror.org/blog/2025-01-09-metadata-matching-beyond-correctness/). 
 
 Maybe members provide affiliations in different ways, but consistently. Faceting by member could be interesting. 
@@ -117,9 +118,7 @@ Maybe members provide affiliations in different ways, but consistently. Faceting
 Maybe members in non-English speaking countries, or authors from non-English speaking countries, deposit affiliations with non-English names. This could be an interesting statistic.
 
 
-
-
-## Good examples found: 
+## Good examples found in the preliminary analysis
 
 10.14232/actahisp.2023.28.9-26
 10.14232/ejqtde.2024.1.73
