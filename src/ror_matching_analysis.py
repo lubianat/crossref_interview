@@ -65,14 +65,6 @@ def main():
 
     update_match_type_with_deepseek(crossref_df, ror_registry_dict)
 
-    # Filter df by no-match and save
-    no_match_without_special_df = crossref_df[crossref_df["match_type"] == "no match"]
-    no_match_without_special_df.to_csv(
-        DATA.joinpath("crossref_ror_ids_with_affiliation_strings_and_no_matches.tsv"),
-        sep="\t",
-        index=False,
-    )
-
     # Apply the mapping to crossref_df and save
     crossref_df["match_category"] = crossref_df["match_type"].apply(
         map_match_type_to_category
@@ -90,6 +82,14 @@ def main():
         index=False,
     )
 
+    # Filter df by no-match and save
+    no_match_without_special_df = crossref_df[crossref_df["match_type"] == "no match"]
+    no_match_without_special_df.to_csv(
+        DATA.joinpath("crossref_ror_ids_with_affiliation_strings_and_no_matches.tsv"),
+        sep="\t",
+        index=False,
+    )
+
     html_output = generate_analysis_html(
         crossref_df, ror_registry_df, no_match_without_special_df
     )
@@ -98,21 +98,60 @@ def main():
 
 
 def generate_analysis_html(crossref_df, ror_registry_df, no_match_without_special_df):
-    # Overall match summary
+
     match_summary = crossref_df["match_type"].value_counts().reset_index()
     match_summary.columns = ["match_type", "count"]
     match_summary_html = match_summary.to_html(index=False)
 
-    # Count the number of "no-match" per ror, show ordered list of ror_ids with the most no-matches
+    # Generate match summary clean
+    match_summary_clean = crossref_df["match_type"].value_counts().reset_index()
+    match_summary_clean.columns = ["match_type", "count"]
+    match_summary_clean["match_category"] = match_summary_clean["match_type"].apply(
+        map_match_type_to_category
+    )
+
+    match_summary_clean = (
+        match_summary_clean.groupby("match_category")["count"]
+        .sum()
+        .reset_index()
+        .sort_values("count", ascending=False)
+    )
+    match_summary_clean_html = match_summary_clean.to_html(
+        index=False, classes="table table-striped"
+    )
+
+    # Now a pie chart for the different groups
+    fig = px.pie(
+        match_summary_clean,
+        values="count",
+        names="match_category",
+        title="Proportion of matches by category",
+    )
+
+    match_summary_pie_html = fig.to_html(full_html=False)
+
+    # Now a pie chart separating "some match" and "no match"
+
+    match_summary_clean["top_level_category"] = match_summary_clean[
+        "match_category"
+    ].apply(lambda x: "some match" if "no match" not in x else x)
+
+    fig = px.pie(
+        match_summary_clean,
+        values="count",
+        names="top_level_category",
+        title="Same, collapsing matches together'",
+    )
+
+    match_summary_pie_simplified_html = fig.to_html(full_html=False)
+
+    # Get and display different supbsets
     _, _, no_match_count_summary_html = parse_no_match_df(
         ror_registry_df, no_match_without_special_df
     )
-
     no_match_count_with_all_cases_df = crossref_df[
         crossref_df["match_type"].str.contains("no match")
     ]
-
-    # Exclude the non-special cases (i.e. the ones in the no_match_df table)
     no_match_count_with_just_special_cases_df = no_match_count_with_all_cases_df[
         ~no_match_count_with_all_cases_df["ROR_ID"].isin(
             no_match_without_special_df["ROR_ID"]
@@ -122,7 +161,6 @@ def generate_analysis_html(crossref_df, ror_registry_df, no_match_without_specia
     _, _, no_match_special_cases_count_summary_html = parse_no_match_df(
         ror_registry_df, no_match_count_with_just_special_cases_df
     )
-
     prefixes_df, prefix_to_name, _ = parse_no_match_df(
         ror_registry_df, no_match_count_with_all_cases_df
     )
@@ -160,29 +198,21 @@ def generate_analysis_html(crossref_df, ror_registry_df, no_match_without_specia
     # For each prefix, calculate the proportion of DOIs in the original table
     #  and the "no-match" table that it represents
 
-    # Calculate the total DOIs in the original table
     all_dois = crossref_df["DOI"]
     all_unmatched_dois = no_match_count_with_all_cases_df["DOI"]
     all_dois_count = len(all_dois)
     all_unmatched_dois_count = len(all_unmatched_dois)
 
-    # Calculate the proportion of DOIs in the original table
     problematic_prefixes["proportion_original"] = problematic_prefixes["prefix"].apply(
         lambda x: all_dois.str.startswith(x).sum() / all_dois_count
     )
-
-    # Calculate the proportion of DOIs in the "no-match" table
     problematic_prefixes["proportion_no_match"] = problematic_prefixes["prefix"].apply(
         lambda x: all_unmatched_dois.str.startswith(x).sum() / all_unmatched_dois_count
     )
-
-    # Calculate the proportion growth from the original table to the "no-match" table
     problematic_prefixes["proportion_ratio"] = (
         problematic_prefixes["proportion_no_match"]
         / problematic_prefixes["proportion_original"]
     )
-
-    # Calculate the proportion of DOIs for this prefix that are problematic
     problematic_prefixes["percentage_unmatched"] = problematic_prefixes["prefix"].apply(
         lambda x: all_unmatched_dois.str.startswith(x).sum()
         / all_dois.str.startswith(x).sum()
@@ -191,8 +221,6 @@ def generate_analysis_html(crossref_df, ror_registry_df, no_match_without_specia
 
     # Convert to HTML
     problematic_prefixes_html = problematic_prefixes.to_html(index=False)
-
-    # Now let's plot the top 10 problematic prefixes
 
     problematic_prefixes = problematic_prefixes.sort_values(
         "percentage_unmatched", ascending=False
@@ -263,22 +291,6 @@ def generate_analysis_html(crossref_df, ror_registry_df, no_match_without_specia
         <img src="pipeline.svg" alt="Matching Pipeline" class="img-fluid">
         """
 
-    # Generate match summary clean
-    match_summary_clean = crossref_df["match_type"].value_counts().reset_index()
-    match_summary_clean.columns = ["match_type", "count"]
-    match_summary_clean["match_category"] = match_summary_clean["match_type"].apply(
-        map_match_type_to_category
-    )
-    match_summary_clean = (
-        match_summary_clean.groupby("match_category")["count"]
-        .sum()
-        .reset_index()
-        .sort_values("count", ascending=False)
-    )
-    match_summary_clean_html = match_summary_clean.to_html(
-        index=False, classes="table table-striped"
-    )
-
     # Define the HTML template with DataTables.js, Bootstrap, and custom CSS
     html_template = """
     <!DOCTYPE html>
@@ -299,9 +311,6 @@ def generate_analysis_html(crossref_df, ror_registry_df, no_match_without_specia
             $(document).ready(function() {{
                 $('table').DataTable({{
                     dom: 'Bfrtip',
-                    buttons: [
-                        'colvis'
-                    ],
                     "pageLength": 5
                 }});
             }});
@@ -357,28 +366,11 @@ def generate_analysis_html(crossref_df, ror_registry_df, no_match_without_specia
     html_parts.append("<h2>Match Summary (grouped)</h2>")
     html_parts.append("<p>Note: greedy matching algorithm</p>")
     html_parts.append(match_summary_clean_html)
-
-    # Now a pie chart for the different groups
-    fig = px.pie(
-        match_summary_clean,
-        values="count",
-        names="match_category",
-        title="Match Summary (grouped)",
-    )
-
-    figure_html = fig.to_html(full_html=False)
-    html_parts.append(figure_html)
-
-    html_parts.append("<h2>Match Summary (complete)</h2>")
-    html_parts.append("<p>Note: greedy matching algorithm</p>")
-    html_parts.append(match_summary_html)
+    html_parts.append(match_summary_pie_html)
+    html_parts.append(match_summary_pie_simplified_html)
 
     html_parts.append("<h2>No Match Counts</h2>")
     html_parts.append(no_match_count_summary_html)
-
-    html_parts.append("<h2>No Match Counts (Special Cases)</h2>")
-    html_parts.append("<h2> Includes withdrawn RORs, special cases, etc.</h2>")
-    html_parts.append(no_match_special_cases_count_summary_html)
 
     # Add the missing plots
     html_parts.append("<h2>Problematic Prefixes</h2>")
@@ -386,6 +378,16 @@ def generate_analysis_html(crossref_df, ror_registry_df, no_match_without_specia
 
     html_parts.append("<h2>Top 10 Problematic Prefixes</h2>")
     html_parts.append(problematic_prefixes_plot_html)
+
+    html_parts.append("<h1>Extra Info</h1>")
+
+    html_parts.append("<h2>No Match Counts (Special Cases)</h2>")
+    html_parts.append("<h2> Includes withdrawn RORs, special cases, etc.</h2>")
+    html_parts.append(no_match_special_cases_count_summary_html)
+
+    html_parts.append("<h2>Match Summary (complete)</h2>")
+    html_parts.append("<p>Note: greedy matching algorithm</p>")
+    html_parts.append(match_summary_html)
 
     html_content = "\n".join(html_parts)
     # Combine the HTML template with the content

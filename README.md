@@ -21,6 +21,8 @@ An overview of how to run the pipeline can be seen at [./src/pipeline.sh](./src/
 
 The pipeline was tailored to run on a simple machine (512GB SSD, 16GB of RAM, 12 intel i5 cores) on Ubuntu 24.04.1 LTS, using Python 3.12.3. 
 
+The general view of the pipeline was drawn using Lucidchart (https://lucid.app/lucidchart/3c243585-649b-4c8b-8da4-f49ae3f54cd0/view).   
+
 ## The problem
  (by Dominika Tkaczyk)
 
