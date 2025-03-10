@@ -226,7 +226,7 @@ def generate_analysis_html(crossref_df, ror_registry_df, no_match_without_specia
         "percentage_unmatched", ascending=False
     )
     fig = px.bar(
-        problematic_prefixes.head(10),
+        problematic_prefixes.head(15),
         x="member_names",
         y="percentage_unmatched",
         title="Top 15 problematic prefixes (normalized by submissions)",
@@ -363,11 +363,13 @@ def generate_analysis_html(crossref_df, ror_registry_df, no_match_without_specia
     html_parts.append(summary_html)
     html_parts.append(decision_tree_html)
 
-    html_parts.append("<h2>Match Summary (grouped)</h2>")
-    html_parts.append("<p>Note: greedy matching algorithm</p>")
-    html_parts.append(match_summary_clean_html)
     html_parts.append(match_summary_pie_html)
     html_parts.append(match_summary_pie_simplified_html)
+
+    html_parts.append("<h2>Top 15 Problematic Prefixes</h2>")
+    html_parts.append(problematic_prefixes_plot_html)
+
+    html_parts.append("<h1>Extra Info</h1>")
 
     html_parts.append("<h2>No Match Counts</h2>")
     html_parts.append(no_match_count_summary_html)
@@ -376,11 +378,9 @@ def generate_analysis_html(crossref_df, ror_registry_df, no_match_without_specia
     html_parts.append("<h2>Problematic Prefixes</h2>")
     html_parts.append(problematic_prefixes_html)
 
-    html_parts.append("<h2>Top 10 Problematic Prefixes</h2>")
-    html_parts.append(problematic_prefixes_plot_html)
-
-    html_parts.append("<h1>Extra Info</h1>")
-
+    html_parts.append("<h2>Match Summary (grouped)</h2>")
+    html_parts.append("<p>Note: greedy matching algorithm</p>")
+    html_parts.append(match_summary_clean_html)
     html_parts.append("<h2>No Match Counts (Special Cases)</h2>")
     html_parts.append("<h2> Includes withdrawn RORs, special cases, etc.</h2>")
     html_parts.append(no_match_special_cases_count_summary_html)
